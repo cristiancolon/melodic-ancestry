@@ -67,8 +67,8 @@ python3 scripts/corpus_qc.py      # after adding any stratum — see Corpus qual
 
 No build log was kept, so these flags were recovered from the index itself: Lakh's artists come from
 the parent directory, no two of its works share a song, and 8,154 of them stop at exactly 160 notes.
-The one deliberate difference is Nottingham's `--pattern` — see the known issue under *The index, as
-built*.
+Nottingham's `--pattern` matters: ingesting its whole `MIDI/` directory stores every tune twice (see
+*The index, as built*).
 
 Re-running any build step is safe: a work already in its stratum is skipped, so nothing is counted
 twice. Before 2026-09-14 that was not true. Re-running `build_index.py` inserted every work again,
@@ -134,7 +134,7 @@ Each overwrites a tracked result file. All read the index; the first three also 
 
 ## The index, as built
 
-**30,434 works · 6,365,312 distinct figures · 17,682,330 postings** across five strata, counted and
+**29,400 works · 6,364,948 distinct figures · 17,005,972 postings** across five strata, counted and
 reported separately, never pooled.
 
 | Stratum | Works | Dated | Repertoire | Licence |
@@ -142,14 +142,14 @@ reported separately, never pooled.
 | `lakh-clean` | 10,011 | 0% | **Western commercial pop** | CC BY 4.0 on Raffel's *aggregation only*; the transcriptions are of copyrighted recordings |
 | `mtc-fs-inst` | 8,986 | 100% | Dutch folk | CC BY-NC-SA 3.0 |
 | `essen` | 8,460 | 0% | European folk | CC BY-NC-SA 3.0 on Zenodo, from stricter CCARH terms; **provenance muddled** |
-| `nottingham` | 2,068 | 0% | British/Irish folk-dance | GPL-3.0 |
+| `nottingham` | 1,034 | 0% | British/Irish folk-dance | GPL-3.0 |
 | `pop909` | 909 | 0% | Chinese popular music | MIT (annotations); compositions remain in copyright |
 
-**Known issue — Nottingham is counted twice.** Found 2026-09-14 and not yet corrected. The stratum
-was ingested with the default `**/*.mid*` glob, which takes each tune both from `MIDI/melody/` and
-from the full arrangement beside it; 1,030 of its 1,034 tunes are stored twice with identical notes.
-It really holds 1,034 works, not 2,068, so every Nottingham count is roughly doubled, and the totals
-above include the 1,034 extra. The build command under *Run it* takes the melody files only.
+**Corrected 2026-09-14 — Nottingham had been counted twice.** It was ingested with the default
+`**/*.mid*` glob, which takes each tune both from `MIDI/melody/` and from the full arrangement beside
+it. 1,030 of its 1,034 tunes were stored twice with identical notes, so the stratum reported 2,068
+works and roughly doubled every Nottingham count. The arrangement copies have been removed. The build
+command under *Run it* takes the melody files only.
 
 The corpus now spans folk *and* commercial pop, which it did not before — a pop hook that previously
 returned N=0 everywhere now returns real counts. What it still cannot do is date them: **only
@@ -209,9 +209,11 @@ index produces.
 
 Gate 3, measured on the folk strata (`scripts/rarity.py`). At 9 notes in the interval encoding,
 **75–79% of figures appear in exactly one work** — the distribution is heavily tailed, so most
-figures genuinely are rare. Nottingham is the outlier at 19% singletons, its dance repertoire being
-far more formulaic. *That reading is now suspect:* the stratum holds every tune twice (see *The
-index, as built*), which by itself pushes singletons toward zero. Re-measure before relying on it.
+figures genuinely are rare. Nottingham, at **89.5%**, is not an outlier. It was first reported at 19%
+singletons and read as a far more formulaic dance repertoire, but that figure came from every tune
+being indexed twice. The corrected figure says nothing about formulaicness either way: at 1,034 works
+the stratum is about a ninth the size of the others, and a smaller corpus yields more singletons by
+construction.
 
 But the separation test is close to null. Figures that recur across independent members of the same
 tune family — musicologically meaningful material — have the **same median document frequency (2)**

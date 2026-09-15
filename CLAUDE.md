@@ -138,9 +138,9 @@ membership, not litigation labels.
 
 ## Corpus status (2026-09-08)
 
-Five strata, **30,434 works, 6.37M figures, 17.7M postings**: `lakh-clean` 10,011 (**Western
+Five strata, **29,400 works, 6.36M figures, 17.0M postings**: `lakh-clean` 10,011 (**Western
 commercial pop**, CC BY 4.0 on the aggregation only, undated), `mtc-fs-inst` 8,986 (Dutch folk,
-dated — the ONLY dated stratum), `essen` 8,460 (European folk, undated), `nottingham` 2,068
+dated — the ONLY dated stratum), `essen` 8,460 (European folk, undated), `nottingham` 1,034
 (British/Irish folk-dance, GPL-3.0, undated), `pop909` 909 (Chinese pop, MIT annotations, undated). Add one with `scripts/add_corpus.py`; the audio route is
 `scripts/transcribe_corpus.py`. `hookline/midi.py` scores tracks to find the melody in a multi-track
 arrangement — indexing the bass as if it were the tune is the MIDI-side version of the audio failure.
@@ -171,6 +171,14 @@ The track scorer had correctly rated them −17.8; `melody()` simply accepted an
 with `MIN_MELODY_SCORE`, which rejects a file when no track looks like a tune — a general guard, not
 a Nottingham patch. Run the QC after adding any stratum: a high "likely bass" share means the counts
 are over the wrong voice.
+
+**QC does not catch duplicates — check them separately.** Two duplication defects were found and fixed
+on 2026-09-14. (1) Re-running `build_index.py` re-inserted 1,785 folk works; `add_documents` now
+skips an existing `(stratum, ext_id)`. (2) The same Nottingham glob also took each tune from both
+`MIDI/melody/` and the full arrangement, storing 1,030 of 1,034 tunes twice. That had produced a
+published "19% singletons, formulaic repertoire" finding; the corrected figure is 89.5%, which is not
+comparable across strata either, because a ~1k-work corpus yields more singletons by construction. Different
+file paths holding the same melody pass the ext_id guard, so compare pitches.
 
 **Coverage is fixed; dating is not.** Adding Lakh took the corpus from folk-only to genuinely
 pop-covering — a hook from a 2011 pop track that previously returned N=0 in every stratum now returns

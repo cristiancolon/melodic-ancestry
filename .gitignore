@@ -16,6 +16,9 @@ data/corpora/
 # Regenerable with scripts/make_demo.py; derived from MTC (CC BY-NC-SA).
 data/demo/
 
+# Local test audio — commercial recordings, never redistributable.
+data/test/
+
 # Measured results (data/*.json) are small and tracked on purpose.
 
 # Editors / OS
