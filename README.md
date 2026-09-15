@@ -10,16 +10,109 @@ and the confidence model the product needs are the same object.
 
 ## Run it
 
-```bash
-python3 scripts/build_index.py 9000     # ~2 min; needs data/*.jsonl.gz
-python3 -m hookline.cli serve           # http://127.0.0.1:8765
-python3 tests/test_hookline.py          # 35 invariant tests
-```
+Everything runs from the repository root. Developed and tested on Python 3.12.
+
+### 1. Install
 
 ```bash
-python3 -m hookline.cli analyse song.mp3 --year 2011
-python3 -m hookline.cli symbolic C5 A4 G4 F4 G4 A4 C5 --year 1900
+pip install numpy soundfile imageio-ffmpeg mido
+pip install demucs          # optional; pulls in torch
 ```
+
+| Package | Needed for |
+|---|---|
+| `numpy` | Everything, including `stats` and the tests. |
+| `soundfile` or `imageio-ffmpeg` | Decoding MP3 — either one will do. `imageio-ffmpeg` bundles its own ffmpeg, so no system install. With neither, only PCM WAV loads. |
+| `mido` | The tests, and adding MIDI corpora. |
+| `demucs` | Separating the vocal from a full mix. Without it `analyse` still runs on the raw mix and says so — which on commercial pop means tracking the bass (see *Real-mix failure* below). |
+
+### 2. Get an index
+
+The index is `data/hookline.db` (about 1.7 GB). It is gitignored, as are the corpora it is built from,
+because several of their licences forbid redistributing the melodies. Check whether you have one:
+
+```bash
+python3 -m hookline.cli stats
+```
+
+If it lists all five strata, go to step 3. Otherwise build it — first the two folk corpora, which are
+the MTCFeatures 1.1 release on [Zenodo](https://zenodo.org/records/3551003) (CC BY-NC-SA 3.0):
+
+```bash
+curl -L -o data/mtc.jsonl.gz   "https://zenodo.org/records/3551003/files/MTC-FS-INST-2.0_sequences-1.1.jsonl.gz?download=1"  # 61 MB
+curl -L -o data/essen.jsonl.gz "https://zenodo.org/records/3551003/files/essen_sequences-1.1.jsonl.gz?download=1"            # 19 MB
+python3 scripts/build_index.py 9000
+```
+
+`9000` caps the *lines read* from each file, not the works indexed: melodies under 12 notes are
+dropped, which is how 9,000 lines became 8,986 and 8,460 works. The script defaults to 8,000, so pass
+9000 to match the index as built.
+
+Then the three MIDI corpora. `data/corpora/` is gitignored for this:
+
+```bash
+mkdir -p data/corpora
+git clone https://github.com/music-x-lab/POP909-Dataset data/corpora/POP909-Dataset
+git clone https://github.com/jukedeck/nottingham-dataset data/corpora/nottingham-dataset
+curl -L http://hog.ee.columbia.edu/craffel/lmd/clean_midi.tar.gz | tar xz -C data/corpora   # 234 MB
+
+python3 scripts/add_corpus.py pop909 data/corpora/POP909-Dataset/POP909 \
+    --pattern "[0-9][0-9][0-9]/[0-9][0-9][0-9].mid"
+python3 scripts/add_corpus.py lakh-clean data/corpora/clean_midi \
+    --artist-from-parent --dedupe --max-notes 160
+python3 scripts/add_corpus.py nottingham data/corpora/nottingham-dataset/MIDI \
+    --tradition folk --pattern "melody/*.mid"
+python3 scripts/corpus_qc.py      # after adding any stratum — see Corpus quality control
+```
+
+No build log was kept, so these flags were recovered from the index itself: Lakh's artists come from
+the parent directory, no two of its works share a song, and 8,154 of them stop at exactly 160 notes.
+The one deliberate difference is Nottingham's `--pattern` — see the known issue under *The index, as
+built*.
+
+Re-running any build step is safe: a work already in its stratum is skipped, so nothing is counted
+twice. Before 2026-09-14 that was not true. Re-running `build_index.py` inserted every work again,
+and this index carried 1,785 duplicate folk works — inflating every count they touched — until they
+were removed that day.
+
+### 3. Use it
+
+```bash
+python3 -m hookline.cli serve                                      # GUI at http://127.0.0.1:8765
+python3 -m hookline.cli analyse song.mp3 --year 2011               # audio → a card per hook
+python3 -m hookline.cli symbolic C5 A4 G4 F4 G4 A4 C5 --year 1900  # notes → one card
+```
+
+`--year` is the reference date for the M ("predates") count. `analyse` also takes `--stem`
+(`auto`, the default, separates only when the mix looks bass-dominated; or `vocals`, `vocals+other`,
+`none`), `--fmin` for the pitch floor in Hz, and `--json`. Every command takes `--db` to point at a
+different index.
+
+The GUI does the same in a browser: upload audio or type notes, set the reference year, stem and pitch
+floor, and play each hook back against the song. Its demo button needs `data/demo/`, which is
+gitignored; make it with the first command below. The second is optional too:
+
+```bash
+python3 scripts/make_demo.py      # data/demo/ — a real MTC melody, synthesised (needs data/mtc.jsonl.gz)
+python3 scripts/seed_ledger.py    # data/ledger.db — live Wikidata + MusicBrainz queries; see The Ledger
+```
+
+### 4. Test
+
+```bash
+python3 tests/test_hookline.py    # 44 invariant checks; builds its own throwaway index
+```
+
+### 5. Reproduce the measured results
+
+```bash
+python3 scripts/evaluate.py 200     # known-item retrieval      → data/eval_results.json
+python3 scripts/degradation.py 100  # the compounding curve     → data/degradation.json
+python3 scripts/rarity.py           # gate 3                    → data/rarity_gate3.json
+python3 scripts/corpus_qc.py        # voice per stratum         → data/corpus_qc.json
+```
+
+Each overwrites a tracked result file. All read the index; the first three also need `data/mtc.jsonl.gz`.
 
 ## What is actually built
 
@@ -51,6 +144,12 @@ reported separately, never pooled.
 | `essen` | 8,460 | 0% | European folk | CC BY-NC-SA 3.0 on Zenodo, from stricter CCARH terms; **provenance muddled** |
 | `nottingham` | 2,068 | 0% | British/Irish folk-dance | GPL-3.0 |
 | `pop909` | 909 | 0% | Chinese popular music | MIT (annotations); compositions remain in copyright |
+
+**Known issue — Nottingham is counted twice.** Found 2026-09-14 and not yet corrected. The stratum
+was ingested with the default `**/*.mid*` glob, which takes each tune both from `MIDI/melody/` and
+from the full arrangement beside it; 1,030 of its 1,034 tunes are stored twice with identical notes.
+It really holds 1,034 works, not 2,068, so every Nottingham count is roughly doubled, and the totals
+above include the 1,034 extra. The build command under *Run it* takes the melody files only.
 
 The corpus now spans folk *and* commercial pop, which it did not before — a pop hook that previously
 returned N=0 everywhere now returns real counts. What it still cannot do is date them: **only
@@ -111,7 +210,8 @@ index produces.
 Gate 3, measured on the folk strata (`scripts/rarity.py`). At 9 notes in the interval encoding,
 **75–79% of figures appear in exactly one work** — the distribution is heavily tailed, so most
 figures genuinely are rare. Nottingham is the outlier at 19% singletons, its dance repertoire being
-far more formulaic.
+far more formulaic. *That reading is now suspect:* the stratum holds every tune twice (see *The
+index, as built*), which by itself pushes singletons toward zero. Re-measure before relying on it.
 
 But the separation test is close to null. Figures that recur across independent members of the same
 tune family — musicologically meaningful material — have the **same median document frequency (2)**

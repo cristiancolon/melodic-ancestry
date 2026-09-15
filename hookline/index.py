@@ -42,6 +42,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ix_fig ON figures(fkey, stratum);
 CREATE INDEX IF NOT EXISTS ix_fig_dist ON figures(stratum, encoding, n, df);
 CREATE INDEX IF NOT EXISTS ix_post ON postings(figure_id);
 CREATE INDEX IF NOT EXISTS ix_doc_stratum ON documents(stratum);
+CREATE INDEX IF NOT EXISTS ix_doc_ext ON documents(stratum, ext_id);
 """
 
 
@@ -105,7 +106,11 @@ class Index:
     ) -> int:
         """Index a batch of melodies. Defaults index three lengths across three
         encodings -- enough for the rarity distribution to be meaningful without
-        multiplying the posting table by the full 5x9 grid."""
+        multiplying the posting table by the full 5x9 grid.
+
+        A work already in the stratum (same ext_id) is skipped, so re-running a build
+        adds nothing. Indexing it again would count one melody twice in every N it
+        touches. Returns the number of works newly added."""
         cur = self.conn.cursor()
         added = 0
         pending: list[tuple] = []
@@ -113,6 +118,10 @@ class Index:
         for doc in docs:
             pitches = [int(p) for p in doc.pitches]
             if len(pitches) < min(n_range):
+                continue
+            if cur.execute(
+                "SELECT 1 FROM documents WHERE stratum=? AND ext_id=?", (stratum, doc.ext_id)
+            ).fetchone():
                 continue
             cur.execute(
                 "INSERT INTO documents(stratum,ext_id,title,artist,year,tradition,n_notes,pitches)"

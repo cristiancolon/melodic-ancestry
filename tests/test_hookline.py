@@ -147,6 +147,14 @@ check("earliest year ignores undated", (idx.lookup(fk, "alpha") or {})["earliest
 check("indexed lengths are reported", idx.indexed_lengths() == [5])
 check("absent figures count zero, not error",
       idx.count(encode.figure_key("interval", 5, (99, 99, 99, 99)), "alpha") == 0)
+again = idx.add_documents("alpha", [
+    Document("a1", "Dated work", [60, 62, 64, 65, 67, 69, 71, 72, 74], year=1900, tradition="pop"),
+], n_range=(5,), encodings=("interval",))
+idx.finalise()
+check("re-indexing a work does not count it twice",
+      again == 0 and idx.count(fk, "alpha") == 2
+      and next(s["n_docs"] for s in idx.strata() if s["name"] == "alpha") == 2,
+      f"added {again}, N={idx.count(fk, 'alpha')}")
 
 print("\nverdicts and abstention")
 card = analyse_figure(idx, [[(p, 1.0)] for p in [60, 62, 64, 65, 67]],
