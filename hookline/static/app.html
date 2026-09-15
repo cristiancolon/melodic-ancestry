@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hookline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F3F6F4; --surface:#FFFFFF; --surface-2:#EAEFEB;
+  --ink:#14181A; --ink-2:#4E5A55; --ink-3:#77837E;
+  --rule:#D5DED8; --rule-strong:#B6C3BB;
+  --accent:#1C6B58; --accent-soft:#DDEBE4;
+  --brass:#8A6215; --brass-soft:#F2E9D5;
+  --warn:#9C3527; --warn-soft:#F6E2DE;
+  --s1:#2a78d6;
+  --shadow:0 1px 2px rgba(20,24,26,.05), 0 8px 24px -16px rgba(20,24,26,.28);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1311; --surface:#151C19; --surface-2:#1B2320;
+  --ink:#E7EDE9; --ink-2:#9FADA7; --ink-3:#7A8981;
+  --rule:#26302C; --rule-strong:#3A4842;
+  --accent:#5CC5A6; --accent-soft:#16302A;
+  --brass:#D7A748; --brass-soft:#2D2617;
+  --warn:#E2796A; --warn-soft:#33201D;
+  --s1:#3987e5;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1311; --surface:#151C19; --surface-2:#1B2320;
+  --ink:#E7EDE9; --ink-2:#9FADA7; --ink-3:#7A8981;
+  --rule:#26302C; --rule-strong:#3A4842;
+  --accent:#5CC5A6; --accent-soft:#16302A;
+  --brass:#D7A748; --brass-soft:#2D2617;
+  --warn:#E2796A; --warn-soft:#33201D;
+  --s1:#3987e5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.ui,.eyebrow,.chip,button,label,select,input,th,.num{font-family:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px 90px}
+header{padding:42px 0 20px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+h1{font-size:clamp(2rem,4.4vw,2.8rem);font-weight:800;letter-spacing:-.025em;margin:0 0 8px;line-height:1.03}
+.lede{color:var(--ink-2);max-width:60ch;margin:0}
+.eyebrow{font-size:.67rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.small{font-size:.87rem;line-height:1.5}
+.dim{color:var(--ink-2)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column}
+.g6{gap:6px}.g10{gap:10px}.g14{gap:14px}.g20{gap:20px}
+
+/* ---------- input ---------- */
+.drop{border:1.5px dashed var(--rule-strong);border-radius:6px;padding:34px 24px;text-align:center;
+  background:var(--surface);cursor:pointer;transition:border-color .15s,background .15s}
+.drop.hot{border-color:var(--accent);background:var(--accent-soft)}
+.drop .big{font-family:"Bricolage Grotesque",sans-serif;font-size:1.15rem;font-weight:700;display:block;margin-bottom:5px}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+button{font-size:.85rem;font-weight:700;padding:10px 18px;border-radius:5px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.drop:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px}
+details.opts{margin-top:14px;border:1px solid var(--rule);border-radius:5px;background:var(--surface)}
+details.opts summary{cursor:pointer;padding:11px 16px;font-size:.85rem;font-weight:700;list-style:none;
+  display:flex;justify-content:space-between;align-items:center}
+details.opts summary::-webkit-details-marker{display:none}
+details.opts summary::after{content:"+";color:var(--accent)}
+details.opts[open] summary::after{content:"\2013"}
+.optbody{padding:0 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+label.field{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  display:block;margin-bottom:5px}
+select,input[type=number],textarea{font-family:"IBM Plex Mono",monospace;font-size:.83rem;padding:8px 10px;
+  border:1px solid var(--rule-strong);border-radius:4px;background:var(--surface);color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:52px;font-size:.86rem}
+
+/* ---------- results ---------- */
+.summary{background:var(--surface);border:1px solid var(--rule-strong);border-radius:6px;padding:18px 20px;
+  margin-bottom:18px;box-shadow:var(--shadow)}
+.headline{font-family:"Bricolage Grotesque",sans-serif;font-size:1.15rem;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}
+.facts{display:flex;gap:18px;flex-wrap:wrap;font-size:.83rem;color:var(--ink-2)}
+.facts b{color:var(--ink);font-weight:600}
+.roll{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px;overflow-x:auto;margin-bottom:20px}
+.roll svg{cursor:pointer;display:block}
+.hook{background:var(--surface);border:1px solid var(--rule-strong);border-radius:6px;overflow:hidden;
+  box-shadow:var(--shadow);margin-bottom:16px}
+.hook .top{padding:15px 20px;border-bottom:1px solid var(--rule);background:var(--surface-2);
+  display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.hook .body{padding:18px 20px;display:flex;flex-direction:column;gap:16px}
+.claim{font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem;font-weight:700;line-height:1.35;margin:0}
+.claim .n{color:var(--accent)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:.66rem;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;padding:4px 9px;border-radius:3px;white-space:nowrap}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.mid{background:var(--brass-soft);color:var(--brass)}
+.chip.no{background:var(--warn-soft);color:var(--warn)}
+
+/* ---------- audio ---------- */
+.play{display:inline-flex;align-items:center;gap:7px;font-family:"Bricolage Grotesque",sans-serif;
+  font-size:.78rem;font-weight:700;padding:7px 13px;border-radius:100px;cursor:pointer;
+  border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink)}
+.play:hover{border-color:var(--accent);color:var(--accent)}
+.play.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.play .ico{font-size:.7rem;line-height:1}
+.play.mini{padding:4px 9px;font-size:.72rem}
+.playrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.compare{border:1px solid var(--rule);border-left:3px solid var(--s1);border-radius:4px;padding:11px 14px;background:var(--surface)}
+
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+tr:last-child td{border-bottom:none}
+td.n{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:5px}
+details.detail{border:1px solid var(--rule);border-radius:5px;background:var(--surface)}
+details.detail summary{cursor:pointer;padding:10px 14px;font-size:.8rem;font-weight:700;color:var(--ink-2);
+  list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.detail summary::-webkit-details-marker{display:none}
+details.detail summary::after{content:"+";color:var(--accent)}
+details.detail[open] summary::after{content:"\2013"}
+.detailbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:14px}
+.stratum{border-top:1px solid var(--rule);padding-top:12px}
+.stratum:first-child{border-top:none;padding-top:0}
+.rarbar{height:7px;border-radius:2px;background:var(--surface-2);border:1px solid var(--rule);overflow:hidden;margin-top:6px}
+.rarbar i{display:block;height:100%;background:var(--s1)}
+.note{border-left:3px solid var(--brass);background:var(--surface);padding:12px 16px;border-radius:4px;
+  font-size:.85rem;line-height:1.55;border-top:1px solid var(--rule);border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+.note.acc{border-left-color:var(--accent)}
+.reasons{margin:0;padding-left:1.1em;font-size:.85rem;color:var(--ink-2)}
+.reasons li{margin-bottom:4px}
+.never{border:1px solid var(--rule);border-left:3px solid var(--warn);background:var(--surface);
+  padding:14px 18px;border-radius:4px;font-size:.84rem;line-height:1.55;margin-top:28px}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--rule-strong);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spinner{animation:none}*{transition:none!important}}
+.hidden{display:none!important}
+@media(max-width:620px){.wrap{padding:0 16px 70px}.optbody{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Melodic prior art</p>
+    <h1>Hookline</h1>
+    <p class="lede">Drop in a song. It finds the hooks and tells you how ordinary each one is &mdash;
+      how many indexed works contain the same figure, and how many came first. You can play every
+      one of them. It never says who copied whom.</p>
+  </header>
+
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an audio file">
+    <span class="big">Drop a song here, or click to choose</span>
+    <span class="small dim">MP3, WAV, FLAC, OGG &middot; the first 90 seconds are analysed</span>
+    <input type="file" id="file" accept="audio/*,.mp3,.wav,.flac,.ogg,.m4a" class="hidden">
+  </div>
+  <div class="actions">
+    <button id="demo">Try the bundled example</button>
+    <button class="ghost" id="symtoggle">Type notes instead</button>
+  </div>
+
+  <details class="opts" id="symwrap">
+    <summary>Type a melody</summary>
+    <div class="optbody" style="grid-template-columns:1fr">
+      <div>
+        <label class="field" for="sym">Notes &mdash; names or MIDI numbers</label>
+        <textarea id="sym" spellcheck="false">C5 A4 G4 F4 G4 A4 C5</textarea>
+        <div class="row" style="margin-top:10px"><button id="symgo">Count this figure</button></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="opts">
+    <summary>Analysis options</summary>
+    <div class="optbody">
+      <div>
+        <label class="field" for="year">Reference year</label>
+        <input type="number" id="year" placeholder="e.g. 2011" min="1000" max="2100">
+        <p class="small dim" style="margin:6px 0 0">Works older than this are counted as prior art.</p>
+      </div>
+      <div>
+        <label class="field" for="stem">Source separation</label>
+        <select id="stem">
+          <option value="auto">Auto &mdash; decide from the audio</option>
+          <option value="vocals">Always isolate vocals</option>
+          <option value="none">Off &mdash; use the raw mix</option>
+        </select>
+        <p class="small dim" style="margin:6px 0 0">On a full mix the tracker otherwise follows the
+          bass. Auto skips separation on clean solo audio, where it only adds error.</p>
+      </div>
+      <div>
+        <label class="field" for="fmin">Lowest note to consider</label>
+        <select id="fmin">
+          <option value="65">Full range &mdash; solo or monophonic</option>
+          <option value="150" selected>Skip low bass &mdash; best for full mixes</option>
+          <option value="220">Vocal register only</option>
+        </select>
+        <p class="small dim" style="margin:6px 0 0">Raising this helps on dense mixes, but cannot
+          tell a voice from a bass harmonic in the same register.</p>
+      </div>
+    </div>
+  </details>
+
+  <div id="status" class="small dim" style="margin:20px 0"></div>
+  <div id="out"></div>
+
+  <div class="never">
+    <strong>What this will never tell you.</strong> Whether one song copied another. It reports counts
+    and dates, not verdicts &mdash; because a count is checkable and a verdict is an opinion. Three of
+    its four conclusions decline to name anyone.
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VERDICT = {
+  distinctive:{cls:"ok", text:"Distinctive", plain:"Rarer than most figures of its length."},
+  commonplace:{cls:"mid", text:"Commonplace", plain:"A building block. Common enough that its presence means little."},
+  no_single_originator:{cls:"mid", text:"No single originator", plain:"The matches are folk or traditional, where asking for “the original” is not a well-posed question."},
+  insufficient_confidence:{cls:"no", text:"Not confident enough", plain:"The transcription is too uncertain to count against. Nothing was measured."}
+};
+let LAST = null;
+
+/* ---------- audio ---------- */
+const player = new Audio();
+let currentBtn = null;
+function stopAudio(){
+  player.pause();
+  if(currentBtn){ currentBtn.classList.remove("on"); currentBtn.querySelector(".ico").textContent = "▶"; }
+  currentBtn = null;
+}
+player.addEventListener("ended", stopAudio);
+function play(url, btn){
+  if(currentBtn === btn){ stopAudio(); return; }
+  stopAudio();
+  player.src = url;
+  player.play().then(() => {
+    currentBtn = btn;
+    btn.classList.add("on");
+    btn.querySelector(".ico").textContent = "■";
+  }).catch(() => { btn.textContent = "audio unavailable"; });
+}
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-audio]");
+  if(btn) play(btn.dataset.audio, btn);
+});
+function playBtn(label, url, mini){
+  return `<button class="play${mini ? " mini" : ""}" data-audio="${esc(url)}" type="button">
+    <span class="ico">▶</span>${esc(label)}</button>`;
+}
+
+/* ---------- piano roll ---------- */
+function pianoRoll(r){
+  const notes = r.notes || [];
+  if(!notes.length) return "";
+  const W = 880, H = 148, pad = 24;
+  const end = r.duration || Math.max(...notes.map(n => n.onset + n.duration)) || 1;
+  const lo = Math.min(...notes.map(n => n.pitch)) - 2, hi = Math.max(...notes.map(n => n.pitch)) + 2;
+  const x = t => pad + (t / end) * (W - pad * 2);
+  const y = p => pad + (1 - (p - lo) / Math.max(hi - lo, 1)) * (H - pad * 2 - 12);
+  const spans = (r.cards || []).map(c => [c.onset, c.offset]);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Transcribed notes over time. Highlighted bands are the detected hooks. Click anywhere to hear that moment.">`;
+  spans.forEach(([a,b], i) => {
+    s += `<rect x="${x(a).toFixed(1)}" y="${pad-10}" width="${Math.max(x(b)-x(a),3).toFixed(1)}" height="${H-pad*2}" fill="var(--accent-soft)"/>`;
+    s += `<text x="${(x(a)+3).toFixed(1)}" y="${pad-1}" font-size="9" fill="var(--accent)" font-family="Bricolage Grotesque,sans-serif" font-weight="700">${i+1}</text>`;
+  });
+  notes.forEach(n => {
+    const w = Math.max((n.duration / end) * (W - pad * 2), 2.5);
+    const inHook = spans.some(([a,b]) => n.onset >= a - 1e-6 && n.onset <= b + 1e-6);
+    s += `<rect x="${x(n.onset).toFixed(1)}" y="${(y(n.pitch)-2.5).toFixed(1)}" width="${w.toFixed(1)}" height="5" rx="2" fill="${inHook ? "var(--accent)" : "var(--rule-strong)"}" opacity="${(0.4+0.6*n.confidence).toFixed(2)}"><title>${esc(n.name)} · ${n.onset.toFixed(1)}s</title></rect>`;
+  });
+  s += `<line x1="${pad}" y1="${H-16}" x2="${W-pad}" y2="${H-16}" stroke="var(--rule-strong)"/>`;
+  s += `<text x="${pad}" y="${H-4}" font-size="9.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">0s</text>`;
+  s += `<text x="${W-pad}" y="${H-4}" font-size="9.5" fill="var(--ink-3)" text-anchor="end" font-family="IBM Plex Mono,monospace">${end.toFixed(0)}s</text>`;
+  return s + "</svg>";
+}
+
+/* ---------- cards ---------- */
+function bestStratum(c){
+  return c.strata.slice().sort((a,b) => (b.n.expected||0) - (a.n.expected||0))[0];
+}
+function claimLine(c, refYear){
+  const best = bestStratum(c);
+  if(!best || best.n.expected <= 0){
+    return `<p class="claim">This figure appears in <span class="n">none</span> of the ${
+      c.strata.reduce((t,s)=>t+s.n_docs,0).toLocaleString()} indexed works.</p>`;
+  }
+  const n = best.n, m = best.m;
+  const range = (n.low === n.high) ? "" : ` <span class="dim" style="font-weight:500;font-size:.85rem">(somewhere between ${n.low} and ${n.high})</span>`;
+  let line = `<p class="claim">Appears in about <span class="n">${Math.round(n.expected)}</span> work${Math.round(n.expected)===1?"":"s"}${range}`;
+  if(m && refYear) line += `, <span class="n">${Math.round(m.expected)}</span> of them before ${refYear}`;
+  return line + `.</p>`;
+}
+function stratumDetail(s, refYear, token){
+  const rows = s.matches.map(mm => {
+    const url = `/api/render?stratum=${encodeURIComponent(s.stratum)}&ext_id=${encodeURIComponent(mm.ext_id)}&pos=${mm.position||0}&n=9`;
+    return `<tr><td>${esc(mm.title || mm.ext_id)}</td><td class="n">${mm.year ?? "—"}</td>
+      <td>${playBtn("hear it", url, true)}</td></tr>`;
+  }).join("");
+  return `<div class="stratum">
+    <div class="row" style="justify-content:space-between">
+      <strong class="ui" style="font-size:.92rem">${esc(s.stratum)}</strong>
+      <span class="small dim mono">${s.n_docs.toLocaleString()} works</span>
+    </div>
+    <div class="small dim" style="margin:6px 0">
+      Contains it: <b style="color:var(--ink)">${s.n.expected}</b> (${s.n.low}–${s.n.high}) ·
+      ${s.m ? `before ${refYear}: <b style="color:var(--ink)">${s.m.expected}</b> (${s.m.low}–${s.m.high}) · ` : ""}
+      single best reading alone would say <b style="color:var(--ink)">${s.n.top1}</b>
+    </div>
+    ${s.rarity_percentile === null ? "" :
+      `<div class="small dim">More common than ${s.rarity_percentile.toFixed(0)}% of figures this length</div>
+       <div class="rarbar"><i style="width:${Math.max(s.rarity_percentile,1).toFixed(0)}%"></i></div>`}
+    ${rows ? `<div class="tw" style="margin-top:10px"><table><thead><tr><th>Work</th><th>Year</th><th>Play</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}
+    <p class="small dim" style="margin:10px 0 0"><strong>Where these come from.</strong> ${esc(s.provenance)}
+      <br><strong>Licence.</strong> ${esc(s.license)}
+      ${s.undated_in_stratum ? `<br>${s.undated_in_stratum.toLocaleString()} works here carry no date and are counted on neither side.` : ""}</p>
+  </div>`;
+}
+function cardView(c, i, r){
+  const v = VERDICT[c.verdict] || {cls:"mid", text:c.verdict, plain:""};
+  const names = (c.pitch_names || c.top1_pitches || []).join(" ");
+  const token = r.clip_token;
+  let players = "";
+  if(token){
+    players += playBtn("Hear it in the song", `/api/clip?token=${token}&start=${c.onset}&end=${c.offset}&source=mix`);
+    if(r.separation && r.separation.separated)
+      players += playBtn("Isolated stem", `/api/clip?token=${token}&start=${c.onset}&end=${c.offset}&source=lead`);
+  }
+  players += playBtn("The figure alone", `/api/render?pitches=${(c.top1_pitches||[]).join(",")}`);
+
+  // The comparison that makes a count checkable: your hook against the oldest work
+  // that shares it. Buried in a collapsed panel it may as well not exist.
+  let compare = "";
+  const best = bestStratum(c);
+  if(best && best.matches && best.matches.length){
+    const dated = best.matches.filter(m => m.year).sort((a,b) => a.year - b.year);
+    const pick = dated[0] || best.matches[0];
+    const url = `/api/render?stratum=${encodeURIComponent(best.stratum)}&ext_id=${encodeURIComponent(pick.ext_id)}&pos=${pick.position||0}&n=${c.n_notes}`;
+    compare = `<div class="compare">
+      <span class="eyebrow">Same figure, earlier work</span>
+      <div class="row" style="margin-top:7px">
+        ${playBtn(`${pick.title || pick.ext_id}${pick.year ? " · " + pick.year : ""}`, url)}
+        <span class="small dim">${dated.length > 1 ? dated.length + " dated matches, oldest shown" : "from " + esc(best.stratum)}</span>
+      </div></div>`;
+  }
+
+  return `<div class="hook">
+    <div class="top">
+      <div>
+        <p class="eyebrow" style="margin-bottom:4px">Hook ${i+1}${c.onset ? " · from " + c.onset.toFixed(1) + "s" : ""}</p>
+        <div class="mono" style="font-size:.9rem">${esc(names)}</div>
+      </div>
+      <span class="chip ${v.cls}">${esc(v.text)}</span>
+    </div>
+    <div class="body">
+      <div class="playrow">${players}</div>
+      ${claimLine(c, r.reference_year)}
+      ${compare}
+      <div class="note ${v.cls === "ok" ? "acc" : ""}">${esc(v.plain)}</div>
+      <details class="detail">
+        <summary>The numbers, per corpus</summary>
+        <div class="detailbody">
+          ${c.strata.map(s => stratumDetail(s, r.reference_year, token)).join("")}
+          <div>
+            <p class="eyebrow" style="margin-bottom:6px">Why this conclusion</p>
+            <ul class="reasons">${c.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+            <p class="small dim" style="margin:8px 0 0">Transcription confidence ${c.mean_confidence.toFixed(2)}
+              · ${c.entropy_bits} bits of reading uncertainty${c.repetitions ? ` · recurs ${c.repetitions}× in this file` : ""}</p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>`;
+}
+
+function summaryLine(r){
+  const counts = {};
+  (r.cards||[]).forEach(c => counts[c.verdict] = (counts[c.verdict]||0)+1);
+  const parts = Object.entries(counts).map(([k,v]) => `${v} ${(VERDICT[k]||{text:k}).text.toLowerCase()}`);
+  const n = (r.cards||[]).length;
+  let head = n ? `Found ${n} figure${n===1?"":"s"} worth counting` : "No figure could be counted";
+  if(parts.length) head += ` — ${parts.join(", ")}`;
+  let facts = "";
+  if(!r.symbolic){
+    facts = `<div class="facts">
+      <span><b>${r.n_notes}</b> notes</span>
+      <span><b>${r.tempo_bpm}</b> BPM</span>
+      <span><b>${esc(r.key)}</b></span>
+      <span>confidence <b>${r.mean_confidence.toFixed(2)}</b></span>
+      <span>${r.separation && r.separation.separated ? "vocals isolated" : "no separation"}</span>
+      <span><b>${r.elapsed}s</b></span></div>`;
+  }
+  let why = "";
+  if(r.separation && r.separation.reason)
+    why = `<p class="small dim" style="margin:10px 0 0">${esc(r.separation.reason)}</p>`;
+  let diag = "";
+  if(!n && r.diagnostics){
+    const d = r.diagnostics;
+    diag = `<p class="small" style="margin:10px 0 0"><strong>Nothing was measured, which is not the
+      same as finding no prior art.</strong> ${d.n_notes} notes transcribed; ${d.phrases_found} phrase(s)
+      long enough to be a melody; ${d.phrases_too_short} too short to index (the shortest indexed figure
+      is ${d.shortest_indexed_length} notes); ${d.phrases_rejected_as_flat || 0} rejected for having no
+      melodic movement. Median gap between notes ${d.median_note_gap_s}s.</p>`;
+  }
+  return `<div class="summary"><p class="headline">${esc(head)}</p>${facts}${why}${diag}</div>`;
+}
+
+function render(r){
+  LAST = r;
+  if(r.error){ $("#status").innerHTML = `<span style="color:var(--warn)">${esc(r.error)}</span>`; $("#out").innerHTML=""; return; }
+  let html = summaryLine(r);
+  if(!r.symbolic && r.notes && r.notes.length) html += `<div class="roll" id="rollwrap">${pianoRoll(r)}</div>`;
+  html += (r.cards||[]).map((c,i) => cardView(c,i,r)).join("");
+  $("#out").innerHTML = html;
+  $("#status").innerHTML = `<strong>${esc(r.file)}</strong>`;
+  const svg = document.querySelector("#rollwrap svg");
+  if(svg && r.clip_token){
+    svg.addEventListener("click", ev => {
+      const box = svg.getBoundingClientRect();
+      const frac = (ev.clientX - box.left) / box.width;
+      const t = Math.max(frac * (r.duration||1) - 0.2, 0);
+      stopAudio();
+      player.src = `/api/clip?token=${r.clip_token}&start=${t.toFixed(2)}&end=${(t+4).toFixed(2)}&source=mix`;
+      player.play().catch(()=>{});
+    });
+  }
+}
+
+/* ---------- requests ---------- */
+async function post(url, body, headers){
+  const res = await fetch(url, {method:"POST", body, headers});
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return {error:"server said: " + text.slice(0,300)}; }
+}
+function busy(msg){ $("#status").innerHTML = `<span class="spinner"></span> ${msg}`; $("#out").innerHTML = ""; stopAudio(); }
+
+async function analyseFile(file){
+  if(!file) return;
+  busy(`analysing <strong>${esc(file.name)}</strong>&hellip; separation can take a few seconds`);
+  const y = $("#year").value.trim();
+  const q = `?name=${encodeURIComponent(file.name)}${y ? "&year="+encodeURIComponent(y) : ""}`
+          + `&fmin=${encodeURIComponent($("#fmin").value)}&stem=${encodeURIComponent($("#stem").value)}`;
+  render(await post("/api/analyze" + q, file, {"Content-Type":"application/octet-stream"}));
+}
+
+const drop = $("#drop");
+drop.onclick = () => $("#file").click();
+drop.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#file").click(); } };
+$("#file").onchange = e => analyseFile(e.target.files[0]);
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("hot"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("hot"); }));
+drop.addEventListener("drop", e => analyseFile(e.dataTransfer.files[0]));
+
+$("#symtoggle").onclick = () => { const d = $("#symwrap"); d.open = !d.open; if(d.open) $("#sym").focus(); };
+$("#symgo").onclick = async () => {
+  const pitches = $("#sym").value.trim();
+  if(!pitches) return;
+  busy("counting&hellip;");
+  const y = $("#year").value.trim();
+  render(await post("/api/symbolic", JSON.stringify({pitches, year: y ? +y : null}), {"Content-Type":"application/json"}));
+};
+async function runDemo(){
+  busy("analysing the bundled example&hellip;");
+  const y = $("#year").value.trim() || "1950";
+  const r = await (await fetch("/api/demo?year=" + encodeURIComponent(y))).json();
+  render(r);
+  if(r.demo_note) $("#out").insertAdjacentHTML("afterbegin",
+    `<div class="note" style="margin-bottom:16px"><strong>Bundled example.</strong> ${esc(r.demo_note)}</div>`);
+}
+$("#demo").onclick = runDemo;
+if(new URLSearchParams(location.search).has("demo")) addEventListener("load", runDemo);
+
+fetch("/api/stats").then(r => r.json()).then(s => {
+  $("#status").innerHTML = `Ready — ${s.index.documents.toLocaleString()} works indexed, `
+    + `${s.index.figures.toLocaleString()} distinct figures.`;
+}).catch(() => $("#status").textContent = "Index not reachable.");
+</script>
+</body>
+</html>

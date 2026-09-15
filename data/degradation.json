@@ -1,0 +1,62 @@
+[
+  {
+    "noise": 0.0,
+    "vibrato": 0.0,
+    "mean_conf": 0.8706,
+    "n": 100,
+    "top1_self": 100,
+    "lattice_self": 100,
+    "top1_family": 59,
+    "lattice_family": 59
+  },
+  {
+    "noise": 0.15,
+    "vibrato": 0.0,
+    "mean_conf": 0.8767,
+    "n": 100,
+    "top1_self": 100,
+    "lattice_self": 100,
+    "top1_family": 61,
+    "lattice_family": 61
+  },
+  {
+    "noise": 0.35,
+    "vibrato": 0.0,
+    "mean_conf": 0.8889,
+    "n": 100,
+    "top1_self": 100,
+    "lattice_self": 100,
+    "top1_family": 62,
+    "lattice_family": 63
+  },
+  {
+    "noise": 0.35,
+    "vibrato": 45.0,
+    "mean_conf": 0.8521,
+    "n": 100,
+    "top1_self": 100,
+    "lattice_self": 100,
+    "top1_family": 64,
+    "lattice_family": 65
+  },
+  {
+    "noise": 0.6,
+    "vibrato": 45.0,
+    "mean_conf": 0.8373,
+    "n": 100,
+    "top1_self": 80,
+    "lattice_self": 80,
+    "top1_family": 51,
+    "lattice_family": 51
+  },
+  {
+    "noise": 0.9,
+    "vibrato": 60.0,
+    "mean_conf": 0.7292,
+    "n": 100,
+    "top1_self": 18,
+    "lattice_self": 23,
+    "top1_family": 13,
+    "lattice_family": 19
+  }
+]

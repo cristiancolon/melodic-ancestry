@@ -1,0 +1,914 @@
+<title>Melodic Ancestry MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F3F6F4;
+  --surface:#FFFFFF;
+  --surface-2:#EAEFEB;
+  --ink:#14181A;
+  --ink-2:#4E5A55;
+  --ink-3:#77837E;
+  --rule:#D5DED8;
+  --rule-strong:#B6C3BB;
+  --accent:#1C6B58;
+  --accent-soft:#DDEBE4;
+  --brass:#8A6215;
+  --brass-soft:#F2E9D5;
+  --warn:#9C3527;
+  --warn-soft:#F6E2DE;
+  --shadow:0 1px 2px rgba(20,24,26,.05), 0 8px 24px -16px rgba(20,24,26,.28);
+  /* data-viz slots — validated categorical (all-pairs) + ordinal ramp, light surface #FFFFFF */
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --ord-1:#86b6ef; --ord-2:#3987e5; --ord-3:#256abf; --ord-4:#104281;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1311;
+    --surface:#151C19;
+    --surface-2:#1B2320;
+    --ink:#E7EDE9;
+    --ink-2:#9FADA7;
+    --ink-3:#7A8981;
+    --rule:#26302C;
+    --rule-strong:#3A4842;
+    --accent:#5CC5A6;
+    --accent-soft:#16302A;
+    --brass:#D7A748;
+    --brass-soft:#2D2617;
+    --warn:#E2796A;
+    --warn-soft:#33201D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --ord-1:#184f95; --ord-2:#2a78d6; --ord-3:#6da7ec; --ord-4:#b7d3f6;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1311;
+  --surface:#151C19;
+  --surface-2:#1B2320;
+  --ink:#E7EDE9;
+  --ink-2:#9FADA7;
+  --ink-3:#7A8981;
+  --rule:#26302C;
+  --rule-strong:#3A4842;
+  --accent:#5CC5A6;
+  --accent-soft:#16302A;
+  --brass:#D7A748;
+  --brass-soft:#2D2617;
+  --warn:#E2796A;
+  --warn-soft:#33201D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --ord-1:#184f95; --ord-2:#2a78d6; --ord-3:#6da7ec; --ord-4:#b7d3f6;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+  font-size:17px;
+  line-height:1.62;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 120px}
+.col{max-width:68ch}
+h1,h2,h3,h4,.eyebrow,.tag,.num,.mono,.chip,.pill,.sec-num{font-family:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif}
+h1{font-size:clamp(2.4rem,5.4vw,3.9rem);line-height:1.02;font-weight:800;letter-spacing:-.025em;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.5rem,2.7vw,2rem);line-height:1.12;font-weight:700;letter-spacing:-.018em;text-wrap:balance;margin:0}
+h3{font-size:1.18rem;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h4{font-size:.94rem;line-height:1.3;font-weight:700;letter-spacing:-.005em;margin:0}
+p{margin:0}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2.5px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+a:hover{text-decoration-color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+strong{font-weight:600}
+em{font-style:italic}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.83em;letter-spacing:-.01em}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.82em;background:var(--surface-2);padding:.1em .38em;border-radius:3px;border:1px solid var(--rule)}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.lede{font-size:1.2rem;line-height:1.5;color:var(--ink-2)}
+.small{font-size:.9rem;line-height:1.5}
+.dim{color:var(--ink-2)}
+.tnum{font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column}
+.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}.g24{gap:24px}.g32{gap:32px}.g44{gap:44px}
+section{padding-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:26px;padding-bottom:14px;border-bottom:1px solid var(--rule-strong)}
+.sec-head .row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.sec-num{font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:3px;white-space:nowrap}
+header.mast{padding:72px 0 8px;border-bottom:2px solid var(--ink);margin-bottom:0}
+.mast .kicker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.pill{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;border-radius:100px;border:1px solid var(--rule-strong);color:var(--ink-2)}
+.pill.on{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.mast .sub{margin:24px 0 40px;max-width:64ch}
+.verdict{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:4px;padding:26px 28px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:20px 22px;display:flex;flex-direction:column;gap:11px}
+.metric{display:flex;flex-direction:column;gap:3px}
+.metric .v{font-family:"Bricolage Grotesque",sans-serif;font-size:2.05rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.metric .k{font-size:.8rem;color:var(--ink-2);line-height:1.35}
+.v.good{color:var(--accent)}.v.bad{color:var(--warn)}.v.mid{color:var(--brass)}
+.rail{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.rail > li{position:relative;padding:0 0 30px 34px;border-left:1px solid var(--rule-strong)}
+.rail > li:last-child{border-left-color:transparent;padding-bottom:0}
+.rail > li::before{content:"";position:absolute;left:-5.5px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--accent)}
+.rail > li.node-open::before{border-color:var(--rule-strong);background:var(--paper)}
+.rail .lab{display:block;margin-bottom:7px}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:"Bricolage Grotesque",sans-serif;font-size:.71rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);background:var(--surface-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+td.n{font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",monospace;font-size:.82rem;white-space:nowrap}
+tr.hi td{background:var(--warn-soft)}
+.card > .chip{align-self:flex-start}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:3px;white-space:nowrap}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.part{background:var(--brass-soft);color:var(--brass)}
+.chip.no{background:var(--warn-soft);color:var(--warn)}
+.note{border:1px solid var(--rule);border-left:3px solid var(--brass);background:var(--surface);padding:16px 20px;border-radius:4px;font-size:.93rem;line-height:1.55}
+.note.warn{border-left-color:var(--warn)}
+.note.acc{border-left-color:var(--accent)}
+.note .h{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:6px}
+blockquote{margin:0;padding:2px 0 2px 20px;border-left:2px solid var(--rule-strong);font-style:italic;color:var(--ink-2);font-size:.98rem;line-height:1.55}
+ul.dots{margin:0;padding-left:1.15em}
+ul.dots li{margin-bottom:8px}
+ul.dots li::marker{color:var(--accent)}
+ol.steps{margin:0;padding-left:1.3em}
+ol.steps li{margin-bottom:12px}
+ol.steps li::marker{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;color:var(--accent);font-size:.92em}
+figure{margin:0;display:flex;flex-direction:column;gap:12px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{font-size:.85rem;color:var(--ink-2);line-height:1.5}
+.figframe{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:22px 20px;overflow-x:auto}
+details{border:1px solid var(--rule);border-radius:4px;background:var(--surface);padding:0}
+summary{cursor:pointer;padding:13px 18px;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-size:1.1rem;line-height:1}
+details[open] summary::after{content:"\2013"}
+details .body{padding:0 18px 18px;font-size:.92rem;line-height:1.55}
+hr.rule{border:none;border-top:1px solid var(--rule);margin:0}
+/* ---------- route identity ---------- */
+.routehead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.swatch{width:12px;height:12px;border-radius:2px;flex:none}
+.sw1{background:var(--s1)}.sw2{background:var(--s2)}.sw3{background:var(--s3)}
+.routecard{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:24px 26px;display:flex;flex-direction:column;gap:18px}
+.routecard.r1{border-top:3px solid var(--s1)}
+.routecard.r2{border-top:3px solid var(--s2)}
+.routecard.r3{border-top:3px solid var(--s3)}
+.kv{display:grid;grid-template-columns:132px 1fr;gap:8px 18px;font-size:.92rem;line-height:1.5}
+.kv dt{font-family:"Bricolage Grotesque",sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+.kv dd{margin:0}
+/* ---------- scorecard matrix ---------- */
+.cell{display:flex;align-items:center;gap:7px;font-family:"Bricolage Grotesque",sans-serif;font-size:.78rem;font-weight:600;color:var(--ink)}
+.lv{width:11px;height:11px;border-radius:2px;flex:none;display:inline-block}
+.lv1{background:var(--ord-1)}.lv2{background:var(--ord-2)}.lv3{background:var(--ord-3)}.lv4{background:var(--ord-4)}
+.ramplegend{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink-2);flex-wrap:wrap}
+.ramplegend .steps{display:flex;gap:2px}
+.ramplegend .steps span{width:22px;height:10px;border-radius:1px}
+/* ---------- chart chrome ---------- */
+.chartlegend{display:flex;gap:18px;flex-wrap:wrap;font-size:.8rem;color:var(--ink-2);align-items:center}
+.chartlegend .k{display:inline-flex;align-items:center;gap:7px}
+.chartlegend .d{width:11px;height:11px;border-radius:50%;flex:none}
+.hitrow{fill:transparent}
+.hitrow:hover{fill:var(--surface-2)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 18px 80px}
+  header.mast{padding-top:44px}
+  .kv{grid-template-columns:1fr;gap:2px 0}
+  .kv dd{margin-bottom:10px}
+}
+</style>
+<div class="wrap">
+
+<header class="mast">
+  <div class="kicker">
+    <span class="pill on">MVP brief</span>
+    <span class="pill">scoping</span>
+    <span class="pill">August 2026</span>
+  </div>
+  <h1>Three routes to a first version</h1>
+  <p class="lede sub">The research settled what is buildable and what isn&rsquo;t. This is the follow-on question: given that, what do we actually build first &mdash; and what does each option cost, prove, and foreclose?</p>
+</header>
+
+<section style="padding-top:44px">
+  <div class="verdict stack g16">
+    <p class="eyebrow">The recommendation, up front</p>
+    <p style="font-size:1.08rem;line-height:1.55">Build <strong>the Ledger</strong> first &mdash; but as a three-week <em>probe</em>, not a product. Its only job is to produce one number: how many directed, dated derivation edges actually exist in the curated layer. That number decides everything downstream.</p>
+    <p style="font-size:1.08rem;line-height:1.55">Then build <strong>the Rarity Index</strong>. It is the thing with a buyer, it never has to answer &ldquo;who copied whom,&rdquo; and it is the denominator every later ancestry claim needs anyway.</p>
+    <p style="font-size:1.08rem;line-height:1.55"><strong>The Trace</strong> &mdash; snippet in, lineage out, the demo we started from &mdash; is not an MVP. It is what the Rarity Index earns the right to attempt. It cannot even state its own abstention rule until the index exists.</p>
+    <hr class="rule">
+    <div class="grid3">
+      <div class="metric"><span class="v bad tnum">0</span><span class="k">verified systems that infer copying direction from the music itself</span></div>
+      <div class="metric"><span class="v mid tnum">~100</span><span class="k">real plagiarism pairs in the entire public ground truth, across all datasets</span></div>
+      <div class="metric"><span class="v bad tnum">0.33</span><span class="k">BMM&#8209;Det top&#8209;1 once a melody is genuinely rewritten &mdash; which is what interpolation looks like</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="row"><span class="sec-num">01</span><h2>What the research found</h2></div>
+    <p class="small dim col">Seven findings, in the order they depend on each other. Each one narrows what an MVP can honestly be.</p>
+  </div>
+
+  <div class="col stack g32">
+    <ol class="rail" style="list-style:none">
+      <li>
+        <span class="lab"><span class="chip ok">Solved</span></span>
+        <h3>Finding similar melodies is a solved-enough engineering problem.</h3>
+        <p class="small dim" style="margin-top:6px">Cover-song identification via fixed-length embeddings works at catalog scale and is open source. ByteCover reports mAP 0.836 on SHS100K, and its embeddings compress to 128&ndash;256d with graceful loss &mdash; which is what turns retrieval into ordinary vector search instead of exhaustive DTW.</p>
+      </li>
+      <li>
+        <span class="lab"><span class="chip no">Not solved</span></span>
+        <h3>Ancestry is not solved by anyone.</h3>
+        <p class="small dim" style="margin-top:6px">Across every verified system, directionality &mdash; who copied whom &mdash; was supplied by human curation, encoded by construction, or decided by manual musicological judgment. It was <strong>never learned from the music</strong>. Similarity is symmetric by construction: BMM&#8209;Det&rsquo;s edit costs are symmetric and its matching is invariant under swapping the two works; no chronology enters the pipeline at any point.</p>
+      </li>
+      <li>
+        <span class="lab"><span class="chip part">Mechanism</span></span>
+        <h3>The two systems that <em>do</em> produce ancestry get direction from outside the audio.</h3>
+        <p class="small dim" style="margin-top:6px">Bryan &amp; Wang (ISMIR 2011) built an influence network entirely from 42,447 hand-curated WhoSampled records, each already a directed source&rarr;destination pair with a release year. Genome of Melody (2025) builds real derivation trees, but <em>rooting</em> them failed: both top candidate roots were historically implausible and the authors re-rooted by hand.</p>
+      </li>
+      <li>
+        <span class="lab"><span class="chip no">Wall</span></span>
+        <h3>Synthetic training data does not transfer to real material.</h3>
+        <p class="small dim" style="margin-top:6px">Every system in this space reports two numbers &mdash; one on its own data, one on real material. The spread is the whole story, and a learned model losing to plain DTW is a signal that the training distribution is wrong, not the architecture.</p>
+      </li>
+      <li>
+        <span class="lab"><span class="chip no">Binding constraint</span></span>
+        <h3>Ground truth is roughly a hundred examples.</h3>
+        <p class="small dim" style="margin-top:6px">Any precision number in this field rests on about a hundred real pairs total. This caps how confidently <em>anything</em> here can be evaluated &mdash; including our own work.</p>
+      </li>
+      <li>
+        <span class="lab"><span class="chip ok">The opening</span></span>
+        <h3>The defensible product is a prior-art index, not an originator oracle.</h3>
+        <p class="small dim" style="margin-top:6px">Yen (58 U.C. Davis L. Rev. 553, 2024) draws the line courts actually use: rarity evidence is admissible, similarity verdicts are not. In <em>Johannsongs-Publishing v. Lovland</em> an expert report was excluded under Rule 702 for calling features &ldquo;highly doubtful&rdquo; to occur elsewhere without having analyzed prior art. &ldquo;This figure appears in N recordings, M of them predating X&rdquo; is evidence courts already credit: in <em>Structured Asset Sales v. Sheeran</em> (aff&rsquo;d 2d Cir. 2024) the court counted twenty-nine prior uses of the progression and twenty-three more before the defendant&rsquo;s release, and that enumeration carried the holding. What no court has yet seen is such a count produced computationally rather than hand-compiled &mdash; that form is untested. And it is symmetric, so it sidesteps direction entirely.</p>
+      </li>
+      <li class="node-open">
+        <span class="lab"><span class="chip part">Boundary</span></span>
+        <h3>&ldquo;Find the original&rdquo; may be ill-posed for the material hooks come from.</h3>
+        <p class="small dim" style="margin-top:6px">Savage et al. found zero highly-related cross-tradition pairs; the 2025 phylogenetics rooting failed outright. For folk and public-domain sources, the honest output is <strong>&ldquo;no single originator&rdquo;</strong> &mdash; which means abstention is a feature to design in, not an error path to bolt on.</p>
+      </li>
+    </ol>
+  </div>
+
+  <figure style="margin-top:44px">
+    <div class="chartlegend">
+      <span class="k"><span class="d" style="background:var(--ord-2)"></span>controlled test set</span>
+      <span class="k"><span class="d" style="background:var(--ord-4)"></span>real or transformed material</span>
+    </div>
+    <div class="figframe">
+      <svg viewBox="0 0 720 262" role="img" aria-label="Dumbbell chart. MelodySim song-level weighted F1 falls from 0.98 on its own split to 0.73 on 116 court cases. The DTW-CQT baseline falls from 0.79 to 0.72. BMM-Det top-1 accuracy falls from 1.00 on transposed melodies to 0.33 on VAE-rewritten melodies. Query-by-humming top-10 falls from 0.921 on a 2,000-song benchmark to 0.707 on a 90,000-song catalog.">
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="215" y1="18" x2="215" y2="206"/>
+            <line x1="325" y1="18" x2="325" y2="206"/>
+            <line x1="435" y1="18" x2="435" y2="206"/>
+            <line x1="545" y1="18" x2="545" y2="206"/>
+            <line x1="655" y1="18" x2="655" y2="206"/>
+          </g>
+          <g class="rows">
+            <g><title>MelodySim, weighted F1: 0.98 song-level in-domain, 0.73 pair-level on 116 real court cases</title>
+              <rect class="hitrow" x="0" y="24" width="720" height="40"/>
+              <text x="0" y="41" font-size="12.5" font-weight="700" fill="var(--ink)">MelodySim</text>
+              <text x="0" y="56" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">weighted F1 &middot; own split &rarr; court cases</text>
+              <line x1="536.2" y1="44" x2="646.2" y2="44" stroke="var(--rule-strong)" stroke-width="2"/>
+              <circle cx="646.2" cy="44" r="6" fill="var(--ord-2)"/>
+              <circle cx="536.2" cy="44" r="6" fill="var(--ord-4)"/>
+              <text x="525.2" y="48" font-size="12" font-weight="700" text-anchor="end" fill="var(--ink)" font-variant-numeric="tabular-nums">0.73</text>
+              <text x="657.2" y="48" font-size="12" font-weight="700" fill="var(--ink-2)" font-variant-numeric="tabular-nums">0.98</text>
+            </g>
+            <g><title>DTW-CQT baseline, F1: 0.79 in-domain, 0.72 on real cases &mdash; its printed accuracy of 0.71 does not reconcile with its own confusion matrix, which gives 0.685</title>
+              <rect class="hitrow" x="0" y="72" width="720" height="40"/>
+              <text x="0" y="89" font-size="12.5" font-weight="700" fill="var(--ink)">DTW&#8209;CQT baseline</text>
+              <text x="0" y="104" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">F1 &middot; same comparison</text>
+              <line x1="531.8" y1="92" x2="562.6" y2="92" stroke="var(--rule-strong)" stroke-width="2"/>
+              <circle cx="562.6" cy="92" r="6" fill="var(--ord-2)"/>
+              <circle cx="531.8" cy="92" r="6" fill="var(--ord-4)"/>
+              <text x="520.8" y="96" font-size="12" font-weight="700" text-anchor="end" fill="var(--ink)" font-variant-numeric="tabular-nums">0.72</text>
+              <text x="573.6" y="96" font-size="12" font-weight="700" fill="var(--ink-2)" font-variant-numeric="tabular-nums">0.79</text>
+            </g>
+            <g><title>BMM-Det top-1 accuracy: 1.00 under transposition, 0.33 when the melody is rewritten by a VAE</title>
+              <rect class="hitrow" x="0" y="120" width="720" height="40"/>
+              <text x="0" y="137" font-size="12.5" font-weight="700" fill="var(--ink)">BMM&#8209;Det</text>
+              <text x="0" y="152" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">top&#8209;1 &middot; transposed &rarr; rewritten</text>
+              <line x1="360.2" y1="140" x2="655" y2="140" stroke="var(--rule-strong)" stroke-width="2"/>
+              <circle cx="655" cy="140" r="6" fill="var(--ord-2)"/>
+              <circle cx="360.2" cy="140" r="6" fill="var(--ord-4)"/>
+              <text x="349.2" y="144" font-size="12" font-weight="700" text-anchor="end" fill="var(--warn)" font-variant-numeric="tabular-nums">0.33</text>
+              <text x="666" y="144" font-size="12" font-weight="700" fill="var(--ink-2)" font-variant-numeric="tabular-nums">1.00</text>
+            </g>
+            <g><title>Query-by-humming top-10: 0.921 on a ~2,000-song benchmark, 0.707 on a 90,000-song catalog</title>
+              <rect class="hitrow" x="0" y="168" width="720" height="40"/>
+              <text x="0" y="185" font-size="12.5" font-weight="700" fill="var(--ink)">Query&#8209;by&#8209;humming</text>
+              <text x="0" y="200" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">top&#8209;10 &middot; 2k songs &rarr; 90k songs</text>
+              <line x1="526.1" y1="188" x2="620.2" y2="188" stroke="var(--rule-strong)" stroke-width="2"/>
+              <circle cx="620.2" cy="188" r="6" fill="var(--ord-2)"/>
+              <circle cx="526.1" cy="188" r="6" fill="var(--ord-4)"/>
+              <text x="515.1" y="192" font-size="12" font-weight="700" text-anchor="end" fill="var(--ink)" font-variant-numeric="tabular-nums">0.707</text>
+              <text x="631.2" y="192" font-size="12" font-weight="700" fill="var(--ink-2)" font-variant-numeric="tabular-nums">0.921</text>
+            </g>
+          </g>
+          <line x1="215" y1="206" x2="655" y2="206" stroke="var(--rule-strong)" stroke-width="1"/>
+          <g font-size="10.5" fill="var(--ink-3)" text-anchor="middle" font-variant-numeric="tabular-nums" font-family="IBM Plex Mono, monospace">
+            <text x="215" y="224">0</text>
+            <text x="325" y="224">0.25</text>
+            <text x="435" y="224">0.50</text>
+            <text x="545" y="224">0.75</text>
+            <text x="655" y="224">1.00</text>
+          </g>
+          <text x="435" y="248" font-size="10.5" fill="var(--ink-3)" text-anchor="middle" letter-spacing="0.9" font-weight="700">SCORE (HIGHER IS BETTER)</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><strong>The generalization gap.</strong> Every one of these systems reports a number on its own data and a number on real material. Note row two: on real cases the plain DTW&#8209;CQT baseline also <em>beats</em> MelodySim on accuracy, 0.71 vs 0.67. And note row three &mdash; transposition is trivial for everything; genuine melodic rewriting, which is exactly what a cross-genre interpolation looks like, is where it collapses.</figcaption>
+  </figure>
+
+  <figure style="margin-top:40px">
+    <div class="figframe">
+      <svg viewBox="0 0 720 176" role="img" aria-label="Bar chart of available ground truth. BMM-Det's 2021 real-world set has 29 song pairs. The 2025 SMP dataset has about 70. The MCIC resource has 116 court cases, all labelled positive, though 66 of them were denied in court.">
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="363.3" y1="18" x2="363.3" y2="140"/>
+            <line x1="496.7" y1="18" x2="496.7" y2="140"/>
+            <line x1="630" y1="18" x2="630" y2="140"/>
+          </g>
+          <g><title>BMM-Det real-world evaluation set, 2021: 29 song pairs</title>
+            <rect class="hitrow" x="0" y="16" width="720" height="38"/>
+            <text x="0" y="31" font-size="12.5" font-weight="700" fill="var(--ink)">BMM&#8209;Det real&#8209;world pairs</text>
+            <text x="0" y="45" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">2021</text>
+            <path d="M230 24 H322.7 A4 4 0 0 1 326.7 28 V40 A4 4 0 0 1 322.7 44 H230 Z" fill="var(--s1)"/>
+            <text x="338.7" y="39" font-size="13" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">29</text>
+          </g>
+          <g><title>SMP dataset, 2025: roughly 70 real pairs; self-described as sample-scale</title>
+            <rect class="hitrow" x="0" y="60" width="720" height="38"/>
+            <text x="0" y="75" font-size="12.5" font-weight="700" fill="var(--ink)">SMP dataset pairs</text>
+            <text x="0" y="89" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">2025 &middot; &ldquo;sample&#8209;scale&rdquo;</text>
+            <path d="M230 68 H459.3 A4 4 0 0 1 463.3 72 V84 A4 4 0 0 1 459.3 88 H230 Z" fill="var(--s1)"/>
+            <text x="475.3" y="83" font-size="13" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">~70</text>
+          </g>
+          <g><title>MCIC: 116 court cases, all labelled positive, though 66 were denied in court</title>
+            <rect class="hitrow" x="0" y="104" width="720" height="38"/>
+            <text x="0" y="119" font-size="12.5" font-weight="700" fill="var(--ink)">MCIC court cases</text>
+            <text x="0" y="133" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">all labelled positive</text>
+            <path d="M230 112 H612.7 A4 4 0 0 1 616.7 116 V128 A4 4 0 0 1 612.7 132 H230 Z" fill="var(--s1)"/>
+            <text x="628.7" y="127" font-size="13" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">116</text>
+            <line x1="450" y1="106" x2="450" y2="138" stroke="var(--warn)" stroke-width="1.6" stroke-dasharray="4 3"/>
+            <text x="444" y="150" font-size="10.5" font-weight="700" fill="var(--warn)" text-anchor="end">66 were denied in court</text>
+          </g>
+          <line x1="230" y1="140" x2="630" y2="140" stroke="var(--rule-strong)" stroke-width="1"/>
+          <g font-size="10.5" fill="var(--ink-3)" text-anchor="middle" font-variant-numeric="tabular-nums" font-family="IBM Plex Mono, monospace">
+            <text x="230" y="164">0</text>
+            <text x="363.3" y="164">40</text>
+            <text x="496.7" y="164">80</text>
+            <text x="630" y="164">120</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption><strong>The entire public ground truth.</strong> Three datasets, heavily overlapping, none built for training. MCIC labels every case positive regardless of outcome, so more than half its &ldquo;positives&rdquo; are figures a court decided were <em>not</em> infringing &mdash; which makes it a poor training target and a good source of hard negatives.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="row"><span class="sec-num">02</span><h2>Three routes</h2></div>
+    <p class="small dim col">Same goal, three different bets about which unknown is worth testing first. They are not variations on one plan &mdash; each one buys a different piece of information, and each one is genuinely shippable on its own.</p>
+  </div>
+
+  <figure>
+    <div class="figframe">
+      <svg viewBox="0 0 720 250" role="img" aria-label="Matrix showing which technical layers each route requires. The Ledger requires only the curated graph and release dates. The Rarity Index requires the curated dates plus a symbolic corpus and n-gram index. The Trace requires all five layers, including audio-to-symbolic transcription, audio embeddings with ANN retrieval, and melodic alignment.">
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <g font-size="11.5" font-weight="700" text-anchor="middle">
+            <circle cx="315" cy="14" r="5" fill="var(--s1)"/>
+            <text x="327" y="18" fill="var(--ink)" text-anchor="start">The Ledger</text>
+            <circle cx="427" cy="14" r="5" fill="var(--s2)"/>
+            <text x="439" y="18" fill="var(--ink)" text-anchor="start">The Rarity Index</text>
+            <circle cx="575" cy="14" r="5" fill="var(--s3)"/>
+            <text x="587" y="18" fill="var(--ink)" text-anchor="start">The Trace</text>
+          </g>
+
+          <g><title>Curated graph and release dates: used by all three routes</title>
+            <text x="0" y="56" font-size="12" font-weight="700" fill="var(--ink)">Curated graph + release dates</text>
+            <text x="0" y="70" font-size="10" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">MusicBrainz work&#8209;rels &middot; Wikidata P144 &middot; human</text>
+            <rect x="300" y="47" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s1) 16%, transparent)" stroke="var(--s1)" stroke-width="1.5"/>
+            <rect x="430" y="47" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s2) 16%, transparent)" stroke="var(--s2)" stroke-width="1.5"/>
+            <rect x="560" y="47" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s3) 16%, transparent)" stroke="var(--s3)" stroke-width="1.5"/>
+          </g>
+          <g><title>Symbolic corpus and n-gram index: used by the Rarity Index and the Trace</title>
+            <text x="0" y="96" font-size="12" font-weight="700" fill="var(--ink)">Symbolic corpus + n&#8209;gram index</text>
+            <text x="0" y="110" font-size="10" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">Meertens &middot; Essen &middot; Themefinder &middot; new build</text>
+            <rect x="300" y="87" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="430" y="87" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s2) 16%, transparent)" stroke="var(--s2)" stroke-width="1.5"/>
+            <rect x="560" y="87" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s3) 16%, transparent)" stroke="var(--s3)" stroke-width="1.5"/>
+          </g>
+          <g><title>Audio to symbolic transcription: required only by the Trace; its error compounding is unmeasured in the literature</title>
+            <text x="0" y="136" font-size="12" font-weight="700" fill="var(--ink)">Audio &rarr; symbolic transcription</text>
+            <text x="0" y="150" font-size="10" fill="var(--warn)" font-family="IBM Plex Mono, monospace">Basic Pitch &middot; Omnizart &middot; error compounding unmeasured</text>
+            <rect x="300" y="127" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="430" y="127" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="560" y="127" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s3) 16%, transparent)" stroke="var(--s3)" stroke-width="1.5"/>
+          </g>
+          <g><title>Audio embeddings and ANN retrieval: required only by the Trace</title>
+            <text x="0" y="176" font-size="12" font-weight="700" fill="var(--ink)">Audio embeddings + ANN retrieval</text>
+            <text x="0" y="190" font-size="10" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">ByteCover&#8209;class &middot; FAISS / pgvector &middot; mature</text>
+            <rect x="300" y="167" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="430" y="167" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="560" y="167" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s3) 16%, transparent)" stroke="var(--s3)" stroke-width="1.5"/>
+          </g>
+          <g><title>Melodic alignment and localization: required only by the Trace</title>
+            <text x="0" y="216" font-size="12" font-weight="700" fill="var(--ink)">Melodic alignment / localization</text>
+            <text x="0" y="230" font-size="10" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">BMM&#8209;Det &middot; MelodySim &middot; partial</text>
+            <rect x="300" y="207" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="430" y="207" width="110" height="26" rx="3" fill="none" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="560" y="207" width="110" height="26" rx="3" fill="color-mix(in srgb, var(--s3) 16%, transparent)" stroke="var(--s3)" stroke-width="1.5"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption><strong>What each route has to build.</strong> Solid = required. Dashed = not needed. The Trace needs every layer including the one nobody has measured, which is most of why it costs four to five times what the Ledger does.</figcaption>
+  </figure>
+
+  <div class="stack g24" style="margin-top:40px">
+
+  <!-- ============ ROUTE 1 ============ -->
+  <article class="routecard r1">
+    <div class="routehead">
+      <span class="swatch sw1"></span>
+      <h3>The Ledger</h3>
+      <span class="chip ok">Recommended first &mdash; as a probe</span>
+    </div>
+    <p><strong>Ship:</strong> a queryable derivation graph with a lineage browser. Type a work, get its ancestors and descendants with dates, ranked by Katz centrality. No audio, no ML, no inference.</p>
+
+    <div class="figframe">
+      <svg viewBox="0 0 720 130" role="img" aria-label="Architecture: MusicBrainz bulk dumps and Wikidata dumps feed a dated work-to-work edge table, which feeds Katz centrality with an alpha sweep, which feeds a lineage browser.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <rect x="0" y="12" width="152" height="40" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="76" y="30" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">MusicBrainz dumps</text>
+          <text x="76" y="44" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">work&#8209;rels: Based on, Medley</text>
+          <rect x="0" y="76" width="152" height="40" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="76" y="94" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">Wikidata dumps</text>
+          <text x="76" y="108" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">P144 / P4969 / P2550</text>
+          <g stroke="var(--ink-3)" stroke-width="1.4" fill="none">
+            <path d="M152 32 H176 V56 H198" marker-end="url(#a1)"/>
+            <path d="M152 96 H176 V74 H198" marker-end="url(#a1)"/>
+            <line x1="360" y1="65" x2="396" y2="65" marker-end="url(#a1)"/>
+            <line x1="542" y1="65" x2="578" y2="65" marker-end="url(#a1)"/>
+          </g>
+          <rect x="202" y="43" width="156" height="44" rx="4" fill="var(--surface)" stroke="var(--s1)" stroke-width="1.5"/>
+          <text x="280" y="61" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">dated edge table</text>
+          <text x="280" y="76" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">work &rarr; work, with year</text>
+          <rect x="400" y="43" width="140" height="44" rx="4" fill="var(--surface)" stroke="var(--s1)" stroke-width="1.5"/>
+          <text x="470" y="61" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">Katz centrality</text>
+          <text x="470" y="76" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">&alpha; sweep, as Bryan &amp; Wang</text>
+          <rect x="582" y="43" width="138" height="44" rx="4" fill="var(--surface)" stroke="var(--rule-strong)"/>
+          <text x="651" y="61" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">lineage browser</text>
+          <text x="651" y="76" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">tree view + dates</text>
+        </g>
+      </svg>
+    </div>
+
+    <dl class="kv">
+      <dt>Settles</dt><dd><strong>How much ancestry is already written down.</strong> Count the directed, dated work&rarr;work edges; count chains of length &ge;3; check how many of twenty reference hooks appear at all. That coverage number decides whether there is a product in the undocumented tail or not.</dd>
+      <dt>Build</dt><dd>MusicBrainz bulk dumps into Postgres &mdash; the API caps at 1&nbsp;request/second, so crawling is not an option. Wikidata dumps or SPARQL for P144/P4969. Join release dates, materialize an edge table, run Katz over it with an &alpha; sweep, put a thin UI on top.</dd>
+      <dt>Estimate</dt><dd class="mono">2&ndash;3 weeks &middot; one engineer &middot; no GPU &middot; no licensing</dd>
+      <dt>What kills it</dt><dd>Nothing kills it &mdash; but sparse coverage <em>demotes</em> it from product to instrument. Wikidata&rsquo;s own constraints discourage P144 on audio tracks, so expect the recording-level graph to be thinner than the work-level one.</dd>
+      <dt>Can&rsquo;t do</dt><dd>Anything not already curated by a human. Zero novel signal, zero coverage of the tail we actually care about. It is the reproduction of a 2011 result, not an advance on it.</dd>
+      <dt>Byproduct</dt><dd class="dim">Every curated chain it surfaces becomes a labelled positive for evaluating the other two routes. This is the cheapest way we have to grow past the ~100-pair ground truth.</dd>
+    </dl>
+  </article>
+
+  <!-- ============ ROUTE 2 ============ -->
+  <article class="routecard r2">
+    <div class="routehead">
+      <span class="swatch sw2"></span>
+      <h3>The Rarity Index</h3>
+      <span class="chip ok">Recommended as the product</span>
+    </div>
+    <p><strong>Ship:</strong> a melodic figure goes in; &ldquo;this figure appears in <span class="mono">N</span> works, <span class="mono">M</span> of them predating <span class="mono">&lt;date&gt;</span>&rdquo; comes out, with the list, the dates, and a rarity percentile. It never says who copied whom &mdash; that is the design, not a limitation.</p>
+
+    <div class="figframe">
+      <svg viewBox="0 0 720 176" role="img" aria-label="Architecture: symbolic corpora are encoded five ways into an inverted n-gram index; a query figure is encoded the same way, looked up, counted and date-filtered against release dates, producing a rarity report.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <rect x="0" y="16" width="150" height="48" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="75" y="35" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">symbolic corpora</text>
+          <text x="75" y="49" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">Meertens 18k &middot; Essen</text>
+          <text x="75" y="60" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">Themefinder &middot; MIDI</text>
+          <rect x="190" y="16" width="160" height="48" rx="4" fill="var(--surface)" stroke="var(--s2)" stroke-width="1.5"/>
+          <text x="270" y="35" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">encode five ways</text>
+          <text x="270" y="49" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">interval &middot; scale degree</text>
+          <text x="270" y="60" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">contour &middot; pitch</text>
+          <rect x="390" y="16" width="150" height="48" rx="4" fill="var(--surface)" stroke="var(--s2)" stroke-width="1.5"/>
+          <text x="465" y="35" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">inverted n&#8209;gram index</text>
+          <text x="465" y="49" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">posting lists, n = 4&ndash;12</text>
+          <rect x="580" y="16" width="140" height="48" rx="4" fill="var(--surface)" stroke="var(--s2)" stroke-width="1.5"/>
+          <text x="650" y="35" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">count + date filter</text>
+          <text x="650" y="49" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">N total, M before date</text>
+          <g stroke="var(--ink-3)" stroke-width="1.4" fill="none">
+            <line x1="150" y1="40" x2="186" y2="40" marker-end="url(#a2)"/>
+            <line x1="350" y1="40" x2="386" y2="40" marker-end="url(#a2)"/>
+            <line x1="540" y1="40" x2="576" y2="40" marker-end="url(#a2)"/>
+            <path d="M650 118 V72" marker-end="url(#a2)"/>
+            <path d="M270 118 V72" marker-end="url(#a2)"/>
+          </g>
+          <rect x="190" y="120" width="160" height="40" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="270" y="138" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">query figure</text>
+          <text x="270" y="152" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">notation, MIDI, or hummed</text>
+          <rect x="580" y="120" width="140" height="40" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="650" y="138" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">release dates</text>
+          <text x="650" y="152" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">from the Ledger</text>
+          <text x="460" y="99" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)" letter-spacing="0.8">SYMMETRIC &mdash; NO DIRECTION CLAIMED</text>
+        </g>
+      </svg>
+    </div>
+
+    <dl class="kv">
+      <dt>Settles</dt><dd><strong>Whether rarity discriminates at all.</strong> Do known hooks separate from musical archetypes in the frequency distribution, or is everything common? If they don&rsquo;t separate, the index is still the honest denominator &mdash; but the wider ambition is dead, and we&rsquo;d know in week ten instead of month nine.</dd>
+      <dt>Build</dt><dd>Start <strong>symbolic</strong> and skip transcription entirely for v1 &mdash; that removes the single largest unmeasured risk from the critical path. Index Themefinder&rsquo;s five encodings as n&#8209;grams into ordinary posting lists; a query is a lookup and a date filter. Nothing here needs a GPU or a model.</dd>
+      <dt>Estimate</dt><dd class="mono">5&ndash;7 weeks &middot; one engineer &middot; no GPU &middot; corpus licensing TBD</dd>
+      <dt>What kills it</dt><dd>The <strong>denominator problem</strong>. A count is only evidence if the corpus is representative, and the available symbolic corpora skew folk and classical &mdash; not commercial pop, which is where the buyers are. &ldquo;Appears in 1,412 recordings&rdquo; is worthless if a court can ask what those 1,412 recordings were drawn from and we can&rsquo;t answer well.</dd>
+      <dt>Can&rsquo;t do</dt><dd>Take audio in, until the transcription spike says it safely can. v1 accepts notation, MIDI, or a hummed query converted by hand.</dd>
+      <dt>Why it&rsquo;s the bet</dt><dd class="dim">It is the only route whose output is admissible evidence rather than the kind of testimony courts are actively excluding &mdash; and the only one that gets more valuable the more corpus you feed it.</dd>
+    </dl>
+  </article>
+
+  <!-- ============ ROUTE 3 ============ -->
+  <article class="routecard r3">
+    <div class="routehead">
+      <span class="swatch sw3"></span>
+      <h3>The Trace</h3>
+      <span class="chip no">Not an MVP &mdash; defer</span>
+    </div>
+    <p><strong>Ship:</strong> the demo we started from. A snippet goes in; date-ordered candidate relatives come out, with the matching bars highlighted and an explicit verdict &mdash; including &ldquo;no single originator.&rdquo;</p>
+
+    <div class="figframe">
+      <svg viewBox="0 0 720 196" role="img" aria-label="Architecture: an audio snippet becomes an embedding, retrieved by approximate nearest neighbour over a bounded catalogue into a candidate set; candidates are transcribed to symbolic form, localized with rhythm-weighted BMM-Det matching, ordered by release date, and passed to an abstention gate fed by the rarity index.">
+        <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <rect x="0" y="12" width="132" height="44" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+          <text x="66" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">audio snippet</text>
+          <text x="66" y="45" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">clip or hum</text>
+          <rect x="170" y="12" width="160" height="44" rx="4" fill="var(--surface)" stroke="var(--s3)" stroke-width="1.5"/>
+          <text x="250" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">embedding + ANN</text>
+          <text x="250" y="45" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">128&ndash;256d &rarr; FAISS</text>
+          <rect x="368" y="12" width="150" height="44" rx="4" fill="var(--surface)" stroke="var(--s3)" stroke-width="1.5"/>
+          <text x="443" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">candidate set</text>
+          <text x="443" y="45" text-anchor="middle" font-size="9.5" fill="var(--warn)" font-family="IBM Plex Mono, monospace">symmetric &mdash; no direction</text>
+          <rect x="556" y="12" width="164" height="44" rx="4" fill="var(--surface)" stroke="var(--s3)" stroke-width="1.5"/>
+          <text x="638" y="31" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">transcribe both sides</text>
+          <text x="638" y="45" text-anchor="middle" font-size="9" fill="var(--warn)" font-family="IBM Plex Mono, monospace">error compounding unmeasured</text>
+          <g stroke="var(--ink-3)" stroke-width="1.4" fill="none">
+            <line x1="132" y1="34" x2="166" y2="34" marker-end="url(#a3)"/>
+            <line x1="330" y1="34" x2="364" y2="34" marker-end="url(#a3)"/>
+            <line x1="518" y1="34" x2="552" y2="34" marker-end="url(#a3)"/>
+            <path d="M638 56 V78 H80 V100" marker-end="url(#a3)"/>
+            <line x1="270" y1="122" x2="304" y2="122" marker-end="url(#a3)"/>
+            <line x1="452" y1="122" x2="486" y2="122" marker-end="url(#a3)"/>
+          </g>
+          <rect x="0" y="100" width="266" height="44" rx="4" fill="var(--surface)" stroke="var(--s3)" stroke-width="1.5"/>
+          <text x="133" y="119" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">localize &mdash; rhythm&#8209;weighted BMM&#8209;Det</text>
+          <text x="133" y="133" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">final &gt; stressed &gt; unstressed &gt; ornamental</text>
+          <rect x="308" y="100" width="140" height="44" rx="4" fill="var(--surface)" stroke="var(--s3)" stroke-width="1.5"/>
+          <text x="378" y="119" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">order by date</text>
+          <text x="378" y="133" text-anchor="middle" font-size="9.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">metadata, not the model</text>
+          <rect x="490" y="100" width="230" height="44" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="605" y="119" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">abstention gate</text>
+          <text x="605" y="133" text-anchor="middle" font-size="9" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">common figure or folk root &rarr; abstain</text>
+          <path d="M605 176 V148" stroke="var(--accent)" stroke-width="1.4" fill="none" marker-end="url(#a3)"/>
+          <text x="605" y="190" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">rarity counts &mdash; from the Rarity Index</text>
+        </g>
+      </svg>
+    </div>
+
+    <dl class="kv">
+      <dt>Settles</dt><dd><strong>Whether the end-to-end experience is possible at all.</strong> High demo value, high investor value, low information value &mdash; because we already know from the literature roughly how it will perform.</dd>
+      <dt>Build</dt><dd>ByteCover&#8209;class embeddings at 128&ndash;256d into FAISS or pgvector over a bounded catalogue (~50k tracks seeded around the chains the Ledger surfaces). Basic Pitch or Omnizart for transcription. BMM&#8209;Det for localization, with edit costs weighted by rhythmic function rather than flat.</dd>
+      <dt>Estimate</dt><dd class="mono">10&ndash;14 weeks &middot; GPU &middot; audio access required</dd>
+      <dt>What kills it</dt><dd>Four things, any one of them: BMM&#8209;Det drops to <strong>0.33</strong> on rewritten melodies, which is exactly what a cross-genre interpolation is; query-by-humming is already at 0.707 on 90k songs and a real catalogue is three orders of magnitude larger; transcription error compounding is unmeasured; and we can only evaluate against ~100 real pairs. Plus we have to legally hold the audio.</dd>
+      <dt>Dependency</dt><dd>It <strong>cannot state its own abstention rule</strong> without the Rarity Index. &ldquo;This figure is commonplace&rdquo; requires a corpus-wide count. Built alone, the Trace has no way to avoid confidently naming an originator for a musical building block &mdash; the <em>Skidmore</em> and <em>Gray v. Hudson</em> failure mode, and the thing it will generate most of.</dd>
+    </dl>
+  </article>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="row"><span class="sec-num">03</span><h2>Side by side</h2></div>
+    <p class="small dim col">Ratings are our judgement, not measurements. Swatch darkness encodes <em>how much</em> of the named quantity &mdash; never whether that is good. Each block header says which direction is better.</p>
+  </div>
+
+  <div class="stack g24">
+    <div class="stack g12">
+      <h4>Cost and risk &mdash; less is better</h4>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th style="width:34%">&nbsp;</th>
+            <th>The Ledger</th><th>The Rarity Index</th><th>The Trace</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Weeks to first usable output</td>
+              <td><span class="cell"><span class="lv lv1"></span>2&ndash;3</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>5&ndash;7</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>10&ndash;14</span></td></tr>
+            <tr><td>Technical risk</td>
+              <td><span class="cell"><span class="lv lv1"></span>Low</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>Moderate</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>High</span></td></tr>
+            <tr><td>Unmeasured unknowns on the critical path</td>
+              <td><span class="cell"><span class="lv lv1"></span>None</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>One</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Three</span></td></tr>
+            <tr><td>Ground truth needed to evaluate it</td>
+              <td><span class="cell"><span class="lv lv1"></span>None</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>Low</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>High</span></td></tr>
+            <tr><td>Dependence on human curation</td>
+              <td><span class="cell"><span class="lv lv4"></span>Total</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>Dates only</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Total</span></td></tr>
+            <tr><td>Needs GPU or licensed audio</td>
+              <td><span class="cell"><span class="lv lv1"></span>Neither</span></td>
+              <td><span class="cell"><span class="lv lv1"></span>Neither</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Both</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="stack g12">
+      <h4>Value &mdash; more is better</h4>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th style="width:34%">&nbsp;</th>
+            <th>The Ledger</th><th>The Rarity Index</th><th>The Trace</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Novel capability created</td>
+              <td><span class="cell"><span class="lv lv1"></span>None</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>High</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>High</span></td></tr>
+            <tr><td>Sellable on its own</td>
+              <td><span class="cell"><span class="lv lv1"></span>Weak</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Strong</span></td>
+              <td><span class="cell"><span class="lv lv2"></span>Demo only</span></td></tr>
+            <tr><td>Output admissible as evidence</td>
+              <td><span class="cell"><span class="lv lv2"></span>Indirect</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Directly</span></td>
+              <td><span class="cell"><span class="lv lv1"></span>The excluded kind</span></td></tr>
+            <tr><td>Reaches the undocumented tail</td>
+              <td><span class="cell"><span class="lv lv1"></span>Not at all</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Fully</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Fully</span></td></tr>
+            <tr><td>Value compounds with more data</td>
+              <td><span class="cell"><span class="lv lv2"></span>Some</span></td>
+              <td><span class="cell"><span class="lv lv4"></span>Strongly</span></td>
+              <td><span class="cell"><span class="lv lv3"></span>Moderately</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ramplegend">
+        <span>magnitude</span>
+        <span class="steps"><span style="background:var(--ord-1)"></span><span style="background:var(--ord-2)"></span><span style="background:var(--ord-3)"></span><span style="background:var(--ord-4)"></span></span>
+        <span>least &rarr; most of the named quantity</span>
+      </div>
+    </div>
+
+    <figure>
+      <div class="figframe">
+        <svg viewBox="0 0 720 160" role="img" aria-label="Range chart of estimated build time. The Ledger, 2 to 3 weeks. The Rarity Index, 5 to 7 weeks. The Trace, 10 to 14 weeks.">
+          <g font-family="Bricolage Grotesque, sans-serif">
+            <g stroke="var(--rule)" stroke-width="1">
+              <line x1="320" y1="16" x2="320" y2="140"/>
+              <line x1="440" y1="16" x2="440" y2="140"/>
+              <line x1="560" y1="16" x2="560" y2="140"/>
+              <line x1="680" y1="16" x2="680" y2="140"/>
+            </g>
+            <g><title>The Ledger: estimated 2 to 3 weeks</title>
+              <rect class="hitrow" x="0" y="22" width="720" height="36"/>
+              <text x="0" y="45" font-size="12.5" font-weight="700" fill="var(--ink)">The Ledger</text>
+              <rect x="260" y="30" width="30" height="20" rx="4" fill="var(--s1)"/>
+              <text x="302" y="45" font-size="12" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">2&ndash;3 weeks</text>
+            </g>
+            <g><title>The Rarity Index: estimated 5 to 7 weeks</title>
+              <rect class="hitrow" x="0" y="62" width="720" height="36"/>
+              <text x="0" y="85" font-size="12.5" font-weight="700" fill="var(--ink)">The Rarity Index</text>
+              <rect x="350" y="70" width="60" height="20" rx="4" fill="var(--s2)"/>
+              <text x="422" y="85" font-size="12" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">5&ndash;7 weeks</text>
+            </g>
+            <g><title>The Trace: estimated 10 to 14 weeks, plus GPU and licensed audio</title>
+              <rect class="hitrow" x="0" y="102" width="720" height="36"/>
+              <text x="0" y="125" font-size="12.5" font-weight="700" fill="var(--ink)">The Trace</text>
+              <rect x="500" y="110" width="120" height="20" rx="4" fill="var(--s3)"/>
+              <text x="632" y="125" font-size="12" font-weight="700" fill="var(--ink)" font-variant-numeric="tabular-nums">10&ndash;14 weeks</text>
+            </g>
+            <line x1="200" y1="140" x2="680" y2="140" stroke="var(--rule-strong)" stroke-width="1"/>
+            <g font-size="10.5" fill="var(--ink-3)" text-anchor="middle" font-variant-numeric="tabular-nums" font-family="IBM Plex Mono, monospace">
+              <text x="200" y="156">0</text><text x="320" y="156">4</text><text x="440" y="156">8</text><text x="560" y="156">12</text><text x="680" y="156">16</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <figcaption><strong>Estimated build time</strong>, one engineer, starting from nothing. Bars show the range, not a point estimate. The Trace figure excludes the time to secure audio rights, which is the part we cannot estimate at all.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="row"><span class="sec-num">04</span><h2>The sequence, and its exits</h2></div>
+    <p class="small dim col">The routes are alternatives on paper and a sequence in practice. What makes it a plan rather than a wish-list is that each stage ends at a gate with a pre-committed answer for both outcomes.</p>
+  </div>
+
+  <figure>
+    <div class="figframe">
+      <svg viewBox="0 0 720 250" role="img" aria-label="Timeline over fourteen weeks. Access questions run weeks 0 to 1. The Ledger runs weeks 0 to 3, ending at gate 1. The transcription spike runs weeks 2 to 4, ending at gate 2. The Rarity Index runs weeks 4 to 10, ending at gate 3. The prior-art index ships around week 11. The Trace begins after week 11, only if the gates pass.">
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="260" y1="14" x2="260" y2="206"/>
+            <line x1="330" y1="14" x2="330" y2="206"/>
+            <line x1="400" y1="14" x2="400" y2="206"/>
+            <line x1="470" y1="14" x2="470" y2="206"/>
+            <line x1="540" y1="14" x2="540" y2="206"/>
+            <line x1="610" y1="14" x2="610" y2="206"/>
+            <line x1="680" y1="14" x2="680" y2="206"/>
+          </g>
+          <g font-size="11.5" font-weight="700" fill="var(--ink)">
+            <g><title>Access questions: weeks 0 to 1</title>
+              <text x="0" y="35">Access questions</text>
+              <rect x="190" y="22" width="35" height="16" rx="4" fill="var(--ink-3)"/></g>
+            <g><title>The Ledger: weeks 0 to 3</title>
+              <text x="0" y="67">The Ledger</text>
+              <rect x="190" y="54" width="105" height="16" rx="4" fill="var(--s1)"/></g>
+            <g><title>Transcription spike: weeks 2 to 4</title>
+              <text x="0" y="99">Transcription spike</text>
+              <rect x="260" y="86" width="70" height="16" rx="4" fill="var(--s3)"/></g>
+            <g><title>The Rarity Index: weeks 4 to 10</title>
+              <text x="0" y="131">The Rarity Index</text>
+              <rect x="330" y="118" width="210" height="16" rx="4" fill="var(--s2)"/></g>
+            <g><title>Ship the prior-art index: around week 11</title>
+              <text x="0" y="163">Ship prior&#8209;art index</text>
+              <rect x="540" y="150" width="35" height="16" rx="4" fill="var(--s2)"/></g>
+            <g><title>The Trace: week 11 onward, only if the gates pass</title>
+              <text x="0" y="195">The Trace <tspan font-weight="500" fill="var(--ink-2)">(if gates pass)</tspan></text>
+              <rect x="575" y="182" width="105" height="16" rx="4" fill="none" stroke="var(--s3)" stroke-width="1.5" stroke-dasharray="4 3"/></g>
+          </g>
+          <g>
+            <line x1="295" y1="14" x2="295" y2="206" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="3 4"/>
+            <circle cx="295" cy="14" r="9" fill="var(--accent)"/>
+            <text x="295" y="18" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--paper)">1</text>
+            <line x1="330" y1="14" x2="330" y2="206" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="3 4"/>
+            <circle cx="330" cy="14" r="9" fill="var(--accent)"/>
+            <text x="330" y="18" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--paper)">2</text>
+            <line x1="540" y1="14" x2="540" y2="206" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="3 4"/>
+            <circle cx="540" cy="14" r="9" fill="var(--accent)"/>
+            <text x="540" y="18" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--paper)">3</text>
+          </g>
+          <line x1="190" y1="206" x2="680" y2="206" stroke="var(--rule-strong)" stroke-width="1"/>
+          <g font-size="10.5" fill="var(--ink-3)" text-anchor="middle" font-variant-numeric="tabular-nums" font-family="IBM Plex Mono, monospace">
+            <text x="190" y="222">0</text><text x="260" y="222">2</text><text x="330" y="222">4</text><text x="400" y="222">6</text>
+            <text x="470" y="222">8</text><text x="540" y="222">10</text><text x="610" y="222">12</text><text x="680" y="222">14</text>
+          </g>
+          <text x="435" y="244" font-size="10.5" fill="var(--ink-3)" text-anchor="middle" letter-spacing="0.9" font-weight="700">WEEKS</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><strong>Fourteen weeks, three gates.</strong> The transcription spike runs in parallel and costs about a week of effort, because its answer changes the architecture of everything after it and we would rather learn it in week four than month six.</figcaption>
+  </figure>
+
+  <div class="tw" style="margin-top:32px">
+    <table style="min-width:720px">
+      <thead><tr><th style="width:44px">Gate</th><th style="width:52px">Week</th><th>The question</th><th>If yes</th><th>If no</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="n">1</td><td class="n">3</td>
+          <td>Are there enough dated, directed edges to browse chains of length &ge;3?</td>
+          <td>The lineage browser is already a product. Ship it while building the index.</td>
+          <td><em>Expected.</em> Confirms the undocumented tail is the whole opportunity. Keep the edges as evaluation data and go straight to the index.</td>
+        </tr>
+        <tr>
+          <td class="n">2</td><td class="n">4</td>
+          <td>Does the melodic relationship survive Basic&nbsp;Pitch and Omnizart on 50 known interpolation pairs?</td>
+          <td>Audio&#8209;first stays alive. The Rarity Index can accept audio queries in v2 and the Trace keeps its front end.</td>
+          <td>The audio&#8209;first architecture is dead. The index stays symbolic; the Trace goes embedding&#8209;only or is shelved. <strong>Nobody has published this measurement</strong> &mdash; we would be first.</td>
+        </tr>
+        <tr>
+          <td class="n">3</td><td class="n">10</td>
+          <td>Does the rarity distribution separate known hooks from musical archetypes?</td>
+          <td>Ship the prior&#8209;art index. Direction reduces to a date join, and the Trace becomes worth attempting.</td>
+          <td>The index still ships as the denominator &mdash; it is useful either way &mdash; but the ancestry ambition is retired, loudly rather than quietly.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure style="margin-top:32px">
+    <div class="figframe">
+      <svg viewBox="0 0 720 214" role="img" aria-label="Two hypothetical shapes for the rarity distribution at gate 3. The horizontal axis is how many recordings contain a given figure, from rare on the left to common on the right; the curve is how many distinct figures fall at each count. In the first shape the query hook sits far to the left of the bulk, so it is genuinely distinctive and rarity discriminates. In the second the hook sits inside the bulk, so it is a commonplace figure and nothing is traceable.">
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <text x="0" y="14" font-size="11" font-weight="700" fill="var(--ink-3)" letter-spacing="1">GATE 3 &mdash; TWO POSSIBLE SHAPES</text>
+
+          <g><title>Outcome one: the query hook falls well to the left of the bulk of figures &mdash; it is rare, so the count is evidence</title>
+            <text x="0" y="44" font-size="12.5" font-weight="700" fill="var(--ink)">The hook sits outside the bulk</text>
+            <path d="M20 172 C 120 172, 160 84, 220 84 C 280 84, 300 172, 320 172 Z" fill="color-mix(in srgb, var(--ord-2) 18%, transparent)" stroke="none"/>
+            <path d="M20 172 C 120 172, 160 84, 220 84 C 280 84, 300 172, 320 172" fill="none" stroke="var(--ord-3)" stroke-width="2"/>
+            <line x1="20" y1="172" x2="320" y2="172" stroke="var(--rule-strong)"/>
+            <line x1="72" y1="168" x2="72" y2="112" stroke="var(--s2)" stroke-width="1.4"/>
+            <circle cx="72" cy="172" r="5.5" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+            <text x="72" y="104" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--s2)">the query hook</text>
+            <text x="222" y="132" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink-2)">archetypes</text>
+            <text x="20" y="204" font-size="10" fill="var(--accent)" font-weight="700">rarity discriminates &mdash; the count is evidence</text>
+          </g>
+
+          <g><title>Outcome two: the query hook falls inside the bulk &mdash; it is a musical building block, and no figure separates</title>
+            <text x="400" y="44" font-size="12.5" font-weight="700" fill="var(--ink)">The hook sits inside the bulk</text>
+            <path d="M420 172 C 520 172, 560 84, 620 84 C 680 84, 700 172, 720 172 Z" fill="color-mix(in srgb, var(--ord-2) 18%, transparent)" stroke="none"/>
+            <path d="M420 172 C 520 172, 560 84, 620 84 C 680 84, 700 172, 720 172" fill="none" stroke="var(--ord-3)" stroke-width="2"/>
+            <line x1="420" y1="172" x2="720" y2="172" stroke="var(--rule-strong)"/>
+            <line x1="600" y1="168" x2="600" y2="140" stroke="var(--s2)" stroke-width="1.4"/>
+            <circle cx="600" cy="172" r="5.5" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+            <text x="600" y="132" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--s2)">the query hook</text>
+            <text x="622" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink-2)">archetypes</text>
+            <text x="420" y="204" font-size="10" fill="var(--warn)" font-weight="700">no separation &mdash; nothing is traceable</text>
+          </g>
+
+          <g font-size="9.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">
+            <text x="20" y="188">rare</text>
+            <text x="320" y="188" text-anchor="end">common &rarr;</text>
+            <text x="420" y="188">rare</text>
+            <text x="720" y="188" text-anchor="end">common &rarr;</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption><strong>Schematic, not data.</strong> Horizontal axis: how many recordings contain a given figure. Vertical: how many distinct figures fall at that count. No values on either, because we have not measured this &mdash; that measurement <em>is</em> gate 3. The left shape means a hook is genuinely distinctive and the count is evidence. The right shape means every figure a court would ask about is a building block, which is itself a publishable finding and the honest end of the ancestry ambition.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="row"><span class="sec-num">05</span><h2>Before week one</h2></div>
+    <p class="small dim col">Four questions that cost days to answer and can each redraw the plan above. None of them are engineering.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Does WhoSampled offer an API, licensed feed, or bulk access?</h4>
+      <p class="small dim">The research could not establish this either way. It is the single highest-leverage unknown we have: 42,447 of its records are the exact asset the only working ancestry paper in the literature ran on. If a feed exists and is affordable, the Ledger stops being a probe and becomes a real graph. Two days of email and a legal read.</p>
+      <span class="chip part">Highest leverage</span>
+    </div>
+    <div class="card">
+      <h4>What audio can we legally hold, and at what scale?</h4>
+      <p class="small dim">The Trace is impossible without a catalogue we can embed and store. This determines whether route three exists at all, and it should be settled before anyone writes retrieval code, not after.</p>
+      <span class="chip no">Blocks the Trace</span>
+    </div>
+    <div class="card">
+      <h4>Is there a commercial-pop symbolic corpus with defensible provenance?</h4>
+      <p class="small dim">The Rarity Index&rsquo;s entire defensibility is its denominator. Meertens and Essen are excellent and skew folk; a court will ask what the corpus was drawn from. Finding &mdash; or assembling &mdash; a pop-weighted corpus we can describe honestly is the difference between evidence and a number.</p>
+      <span class="chip no">Blocks the product claim</span>
+    </div>
+    <div class="card">
+      <h4>What is SecondHandSongs&rsquo; actual schema?</h4>
+      <p class="small dim">Claims about its <code>basedOn</code> and <code>derivedWorks</code> fields were refuted in verification &mdash; meaning unverifiable from the cited source, not disproven, since the schema page was unreachable. If those fields exist, it is a second curated derivation layer for free. Worth one afternoon.</p>
+      <span class="chip part">Cheap to check</span>
+    </div>
+  </div>
+
+  <div class="note warn" style="margin-top:28px">
+    <span class="h">What we will not ship, at any stage</span>
+    <ul class="dots small" style="margin-top:4px">
+      <li>A similarity percentage presented as a conclusion. That is precisely the testimony Yen argues courts should exclude, and the thing experts are being excluded under Rule&nbsp;702 for offering.</li>
+      <li>An &ldquo;X copied Y&rdquo; output derived from the model. Direction comes from dates and curated edges or it is not claimed.</li>
+      <li>A named originator where the earliest instance is folk or public-domain material. That path returns <strong>&ldquo;no single originator&rdquo;</strong> and says why.</li>
+      <li>A precision or recall figure stated without its denominator, when that denominator is roughly a hundred examples.</li>
+    </ul>
+  </div>
+
+  <div class="note acc" style="margin-top:18px">
+    <span class="h">One caveat carried forward</span>
+    <p class="small">The Kjarkas &rarr; Lambada &rarr; <em>On the Floor</em> chain that started this project was never independently verified in either research pass &mdash; treat it as widely reported rather than confirmed. It does not weaken the case for any route here. The point of that example was always that the chain is in a database because a human put it there, and the value of what we build is in the tail where nobody did.</p>
+  </div>
+</section>
+
+<section>
+  <hr class="rule">
+  <div class="stack g12" style="padding-top:26px">
+    <p class="eyebrow">Companion document</p>
+    <p class="small dim col">Every claim, number and citation summarized in section&nbsp;01 is sourced in the research report: <a href="https://claude.ai/code/artifact/5e9676f7-4b92-4953-9c79-89226fc49b4b">Melodic Ancestry &mdash; tracing a melody back to its root</a>. Two passes, 207 agents, 42 sources fetched, 25 claims adversarially verified, 8 killed.</p>
+    <p class="small dim col">Effort figures and ratings in sections&nbsp;03 and&nbsp;04 are our estimates, not measurements. Everything in section&nbsp;01 is sourced.</p>
+  </div>
+</section>
+
+</div>

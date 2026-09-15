@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Corpora and derived stores — large, and several carry licences that forbid
+# redistributing the melodies (see CLAUDE.md, "Caveats to carry forward").
+data/*.jsonl.gz
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/corpora/
+
+# Regenerable with scripts/make_demo.py; derived from MTC (CC BY-NC-SA).
+data/demo/
+
+# Measured results (data/*.json) are small and tracked on purpose.
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

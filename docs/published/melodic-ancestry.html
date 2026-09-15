@@ -1,0 +1,645 @@
+<title>Melodic Ancestry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#F3F6F4;
+  --surface:#FFFFFF;
+  --surface-2:#EAEFEB;
+  --ink:#14181A;
+  --ink-2:#4E5A55;
+  --ink-3:#77837E;
+  --rule:#D5DED8;
+  --rule-strong:#B6C3BB;
+  --accent:#1C6B58;
+  --accent-soft:#DDEBE4;
+  --brass:#8A6215;
+  --brass-soft:#F2E9D5;
+  --warn:#9C3527;
+  --warn-soft:#F6E2DE;
+  --shadow:0 1px 2px rgba(20,24,26,.05), 0 8px 24px -16px rgba(20,24,26,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1311;
+    --surface:#151C19;
+    --surface-2:#1B2320;
+    --ink:#E7EDE9;
+    --ink-2:#9FADA7;
+    --ink-3:#7A8981;
+    --rule:#26302C;
+    --rule-strong:#3A4842;
+    --accent:#5CC5A6;
+    --accent-soft:#16302A;
+    --brass:#D7A748;
+    --brass-soft:#2D2617;
+    --warn:#E2796A;
+    --warn-soft:#33201D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1311;
+  --surface:#151C19;
+  --surface-2:#1B2320;
+  --ink:#E7EDE9;
+  --ink-2:#9FADA7;
+  --ink-3:#7A8981;
+  --rule:#26302C;
+  --rule-strong:#3A4842;
+  --accent:#5CC5A6;
+  --accent-soft:#16302A;
+  --brass:#D7A748;
+  --brass-soft:#2D2617;
+  --warn:#E2796A;
+  --warn-soft:#33201D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+  font-size:17px;
+  line-height:1.62;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 120px}
+.col{max-width:68ch}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4,.eyebrow,.tag,.num,.mono{font-family:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif}
+h1{font-size:clamp(2.4rem,5.4vw,3.9rem);line-height:1.02;font-weight:800;letter-spacing:-.025em;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.5rem,2.7vw,2rem);line-height:1.12;font-weight:700;letter-spacing:-.018em;text-wrap:balance;margin:0}
+h3{font-size:1.18rem;line-height:1.25;font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h4{font-size:.94rem;line-height:1.3;font-weight:700;letter-spacing:-.005em;margin:0}
+p{margin:0}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2.5px;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+a:hover{text-decoration-color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+strong{font-weight:600}
+em{font-style:italic}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.83em;letter-spacing:-.01em}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.82em;background:var(--surface-2);padding:.1em .38em;border-radius:3px;border:1px solid var(--rule)}
+.eyebrow{
+  font-size:.7rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin:0;
+}
+.lede{font-size:1.2rem;line-height:1.5;color:var(--ink-2)}
+.small{font-size:.9rem;line-height:1.5}
+.dim{color:var(--ink-2)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- layout primitives ---------- */
+.stack{display:flex;flex-direction:column}
+.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}.g24{gap:24px}.g32{gap:32px}.g44{gap:44px}
+
+section{padding-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:26px;padding-bottom:14px;border-bottom:1px solid var(--rule-strong)}
+.sec-head .row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.sec-num{
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;
+  color:var(--accent);background:var(--accent-soft);
+  padding:3px 8px;border-radius:3px;white-space:nowrap;
+}
+
+/* ---------- masthead ---------- */
+header.mast{padding:72px 0 8px;border-bottom:2px solid var(--ink);margin-bottom:0}
+.mast .kicker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.pill{
+  font-family:"Bricolage Grotesque",sans-serif;font-size:.7rem;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;
+  padding:4px 10px;border-radius:100px;border:1px solid var(--rule-strong);color:var(--ink-2);
+}
+.pill.on{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.mast .sub{margin:24px 0 40px;max-width:64ch}
+
+/* ---------- verdict ---------- */
+.verdict{
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:4px;padding:26px 28px;box-shadow:var(--shadow);
+}
+
+/* ---------- cards / grid ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:16px}
+.card{
+  background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:11px;
+}
+.card.flat{background:transparent;box-shadow:none}
+
+/* metric */
+.metric{display:flex;flex-direction:column;gap:3px}
+.metric .v{font-family:"Bricolage Grotesque",sans-serif;font-size:2.05rem;font-weight:700;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.metric .k{font-size:.8rem;color:var(--ink-2);line-height:1.35}
+.v.good{color:var(--accent)}
+.v.bad{color:var(--warn)}
+.v.mid{color:var(--brass)}
+
+/* ---------- lineage rail (echoes a derivation graph) ---------- */
+.rail{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.rail > li{
+  position:relative;padding:0 0 30px 34px;border-left:1px solid var(--rule-strong);
+}
+.rail > li:last-child{border-left-color:transparent;padding-bottom:0}
+.rail > li::before{
+  content:"";position:absolute;left:-5.5px;top:8px;width:10px;height:10px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--accent);
+}
+.rail > li.node-open::before{border-color:var(--rule-strong);background:var(--paper)}
+.rail .lab{display:block;margin-bottom:7px}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:520px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:"Bricolage Grotesque",sans-serif;font-size:.71rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
+  background:var(--surface-2);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.n{font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",monospace;font-size:.82rem;white-space:nowrap}
+tr.hi td{background:var(--warn-soft)}
+
+/* ---------- chips ---------- */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:"Bricolage Grotesque",sans-serif;font-size:.67rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 8px;border-radius:3px;white-space:nowrap;
+}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.part{background:var(--brass-soft);color:var(--brass)}
+.chip.no{background:var(--warn-soft);color:var(--warn)}
+
+/* ---------- callout ---------- */
+.note{
+  border:1px solid var(--rule);border-left:3px solid var(--brass);background:var(--surface);
+  padding:16px 20px;border-radius:4px;font-size:.93rem;line-height:1.55;
+}
+.note.warn{border-left-color:var(--warn)}
+.note.acc{border-left-color:var(--accent)}
+.note .h{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:6px}
+
+/* ---------- quote ---------- */
+blockquote{
+  margin:0;padding:2px 0 2px 20px;border-left:2px solid var(--rule-strong);
+  font-style:italic;color:var(--ink-2);font-size:.98rem;line-height:1.55;
+}
+
+/* ---------- lists ---------- */
+ul.dots{margin:0;padding-left:1.15em}
+ul.dots li{margin-bottom:8px}
+ul.dots li::marker{color:var(--accent)}
+ol.steps{margin:0;padding-left:1.3em}
+ol.steps li{margin-bottom:12px}
+ol.steps li::marker{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;color:var(--accent);font-size:.92em}
+
+/* ---------- diagram ---------- */
+figure{margin:0;display:flex;flex-direction:column;gap:12px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{font-size:.85rem;color:var(--ink-2);line-height:1.5}
+.figframe{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:22px 20px;overflow-x:auto}
+
+/* ---------- source list ---------- */
+.srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0 28px}
+.srcs .s{padding:9px 0;border-bottom:1px solid var(--rule);font-size:.86rem;line-height:1.45}
+.srcs .s .t{display:block;color:var(--ink-2);font-size:.78rem;margin-top:2px}
+
+details{border:1px solid var(--rule);border-radius:4px;background:var(--surface);padding:0}
+summary{
+  cursor:pointer;padding:13px 18px;font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-size:1.1rem;line-height:1}
+details[open] summary::after{content:"–"}
+details .body{padding:0 18px 18px;font-size:.92rem;line-height:1.55}
+
+hr.rule{border:none;border-top:1px solid var(--rule);margin:0}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 18px 80px}
+  header.mast{padding-top:44px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="kicker">
+    <span class="pill on">Research brief</span>
+    <span class="pill">MIR &middot; provenance &middot; rights</span>
+    <span class="pill">August 2026</span>
+  </div>
+  <h1>Tracing a melody<br>back to its root</h1>
+  <p class="lede sub">What actually exists for following a melodic fragment up its chain of descent &mdash; the systems, the datasets, the numbers they report, and the one thing none of them do.</p>
+</header>
+
+<section style="padding-top:40px">
+  <div class="verdict col">
+    <p class="eyebrow" style="margin-bottom:12px">The short version</p>
+    <p style="margin-bottom:14px">The <em>similarity</em> half of this problem is a solved-enough engineering problem. Catalog-scale retrieval of melodic relatives works, is open source, and reduces to vector search.</p>
+    <p style="margin-bottom:14px">The <em>ancestry</em> half is not solved by anyone. Across every verified system in this survey, directionality &mdash; who copied whom &mdash; was either supplied by human curation, encoded by construction, or decided by manual musicological judgment. It was never learned from the music.</p>
+    <p>That gap is stable enough to plan around, and it points at a different product than the one you described. The defensible thing to build is not an originator oracle. It is a <strong>prior-art index</strong>: a corpus-scale answer to "how common is this figure, and where else does it appear?" That is the question courts are actively excluding expert testimony for failing to answer, and it is symmetric, so it sidesteps direction entirely.</p>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">01</span>
+      <h2>Three layers exist. They do not connect.</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">Everything verified here sits in one of three tiers. Each tier is individually usable today. Nothing published stitches them into an end-to-end audio&nbsp;&rarr;&nbsp;provenance&#8209;chain system.</p>
+  </div>
+
+  <ul class="rail col" style="max-width:78ch">
+    <li>
+      <span class="lab"><span class="chip ok">Layer A &middot; mature</span></span>
+      <h3 style="margin-bottom:8px">Audio retrieval &mdash; find the relatives</h3>
+      <p class="small">Cover-song identification via fixed-length embeddings. <strong>ByteCover</strong> (ByteDance + Peking University, ICASSP 2021) &mdash; ResNet-50 with IBN blocks, GeM pooling, BNNeck joint softmax + triplet training &mdash; reports mAP <span class="mono tnum">0.714</span> on Da-TACOS and <span class="mono tnum">0.836</span> on SHS100K. Its 2048-d embeddings compress to 256-d at mAP <span class="mono tnum">0.653</span> and 128-d at <span class="mono tnum">0.615</span>, which is what makes ANN search over a full catalog feasible instead of exhaustive DTW. This is the tier that scales.</p>
+    </li>
+    <li>
+      <span class="lab"><span class="chip part">Layer B &middot; partial</span></span>
+      <h3 style="margin-bottom:8px">Melodic matching &mdash; localize the borrowed bars</h3>
+      <p class="small">Systems that say <em>which</em> notes match, not just that two tracks are related. <strong>BMM-Det</strong> (ACM Multimedia 2023) does this symbolically over MIDI; <strong>MelodySim</strong> (SUTD, 2025) does it over audio with a frozen MERT encoder. Both work well in-domain. Both degrade sharply on real material &mdash; see &sect;03.</p>
+    </li>
+    <li class="node-open">
+      <span class="lab"><span class="chip no">Layer C &middot; human-curated</span></span>
+      <h3 style="margin-bottom:8px">The graph &mdash; who came first</h3>
+      <p class="small">Directed derivation edges live in hand-maintained databases: WhoSampled, MusicBrainz work relationships, Wikidata, SecondHandSongs. Every working multi-hop ancestry result in the literature runs on this layer, not on audio. No verified system infers an edge's <em>direction</em> from the music.</p>
+    </li>
+  </ul>
+
+  <figure style="margin-top:40px" class="col" >
+    <div class="figframe">
+      <svg viewBox="0 0 860 306" role="img" aria-label="Diagram: audio query flows through embedding retrieval and melodic alignment to produce symmetric candidate pairs, which only become a directed ancestry chain when release-date metadata and a curated relationship graph are joined in from outside the model.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="arA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <g font-family="Bricolage Grotesque, sans-serif">
+          <!-- pipeline boxes -->
+          <g color="var(--rule-strong)">
+            <rect x="8" y="94" width="120" height="58" rx="4" fill="var(--surface-2)" stroke="var(--rule-strong)"/>
+            <text x="68" y="118" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">audio</text>
+            <text x="68" y="135" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">snippet</text>
+
+            <rect x="168" y="94" width="140" height="58" rx="4" fill="var(--surface)" stroke="var(--rule-strong)"/>
+            <text x="238" y="117" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">embedding</text>
+            <text x="238" y="134" text-anchor="middle" font-size="11" fill="var(--ink-2)">ANN over catalog</text>
+
+            <rect x="348" y="94" width="140" height="58" rx="4" fill="var(--surface)" stroke="var(--rule-strong)"/>
+            <text x="418" y="117" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">alignment</text>
+            <text x="418" y="134" text-anchor="middle" font-size="11" fill="var(--ink-2)">localize the bars</text>
+
+            <rect x="528" y="94" width="150" height="58" rx="4" fill="var(--surface)" stroke="var(--rule-strong)"/>
+            <text x="603" y="117" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">candidate pairs</text>
+            <text x="603" y="134" text-anchor="middle" font-size="11" fill="var(--warn)">symmetric &mdash; no direction</text>
+          </g>
+
+          <g stroke="var(--ink-3)" stroke-width="1.4" color="var(--ink-3)" fill="none">
+            <line x1="130" y1="123" x2="162" y2="123" marker-end="url(#ar)"/>
+            <line x1="310" y1="123" x2="342" y2="123" marker-end="url(#ar)"/>
+            <line x1="490" y1="123" x2="522" y2="123" marker-end="url(#ar)"/>
+          </g>
+
+          <!-- the gap -->
+          <line x1="706" y1="26" x2="706" y2="280" stroke="var(--warn)" stroke-width="1.4" stroke-dasharray="5 5"/>
+          <text x="714" y="40" font-size="10.5" font-weight="700" fill="var(--warn)" letter-spacing="1.1">THE GAP</text>
+
+          <!-- outside input -->
+          <g>
+            <rect x="348" y="212" width="330" height="60" rx="4" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="513" y="236" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--accent)">release dates + curated relationship graph</text>
+            <text x="513" y="254" text-anchor="middle" font-size="11" fill="var(--ink-2)">supplied by humans, not inferred from audio</text>
+          </g>
+          <g stroke="var(--accent)" stroke-width="1.6" fill="none">
+            <path d="M603 208 L603 160" marker-end="url(#arA)"/>
+          </g>
+
+          <!-- output chain -->
+          <g>
+            <circle cx="760" cy="98" r="9" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="760" cy="150" r="9" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="760" cy="202" r="9" fill="var(--accent)" stroke="var(--accent)" stroke-width="2"/>
+            <g stroke="var(--accent)" stroke-width="1.6" fill="none" color="var(--accent)">
+              <line x1="760" y1="109" x2="760" y2="139" marker-end="url(#arA)"/>
+              <line x1="760" y1="161" x2="760" y2="191" marker-end="url(#arA)"/>
+            </g>
+            <text x="780" y="102" font-size="11.5" font-weight="700" fill="var(--ink)">1981 root</text>
+            <text x="780" y="154" font-size="11.5" fill="var(--ink-2)">1989 intermediary</text>
+            <text x="780" y="206" font-size="11.5" fill="var(--ink-2)">2011 query</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Everything left of the dashed line is learnable and open source today. The arrows on the right &mdash; the actual ancestry &mdash; only exist because something outside the model supplied chronology and curated edges.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 2 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">02</span>
+      <h2>Direction is the wall</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">This was the most consistent finding across the whole survey, and every independent verifier reached it separately.</p>
+  </div>
+
+  <div class="stack g24 col" style="max-width:74ch">
+    <p>Similarity is symmetric by construction. <strong>BMM-Det</strong>'s edit-distance costs are symmetric (insertion cost = deletion cost = 1) and its Kuhn&ndash;Munkres matching is invariant under swapping the two vertex sets &mdash; no chronology, release date, or provenance signal enters the pipeline at any point. The authors are explicit that "the determination of music plagiarism ultimately falls within the realm of legal judgment." MelodySim likewise measures symmetric similarity only. Savage et al.'s folk-melody work estimates mutation rates and infers no directionality at all.</p>
+
+    <p>Two systems <em>do</em> produce ancestry. Both get their direction from outside the music:</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>Bryan &amp; Wang, ISMIR 2011</h4>
+        <p class="small">Built an influence network entirely from <strong>42,447 human-curated WhoSampled records</strong> &mdash; each already a directed source&rarr;destination pair with release year. A grep of the full paper finds no signal, spectral, or acoustic analysis anywhere. Direction was handed to it.</p>
+      </div>
+      <div class="card">
+        <h4>Genome of Melody, 2025</h4>
+        <p class="small">A full Bayesian phylogenetic toolchain that builds real derivation <em>trees</em>. But rooting the tree &mdash; deciding what came first &mdash; failed. On the Introits dataset both top candidate roots were judged historically implausible and the authors re-rooted <strong>by hand</strong>, stating the model-selection method "behaved in a faulty manner."</p>
+      </div>
+    </div>
+
+    <div class="note acc">
+      <span class="h">The one reusable mechanism</span>
+      Bryan &amp; Wang's Katz centrality, <code>I_K = (I &minus; &alpha;A)&#8315;&sup1; &minus; I</code>, propagates credit up a chain: <code>A&#7503;</code> counts sample chains of length <em>k</em>, and &alpha; tunes how much indirect influence flows. On the "Amen" break, credit visibly shifts from The Winstons (0.82 at &alpha;=0) toward Jester Hairston, the actual origin, as &alpha; rises. They rejected PageRank deliberately, because it down-weights artists with lengthy careers.
+      <br><br>
+      <strong>Honest deflation:</strong> at &alpha;=1.0 Hairston lands at rank 10 of 10 in a three-way tie at 0.46, far below Change the Beat at 1.0. &alpha; accumulates transitive credit; it does <em>not</em> order ancestry. And this is a single illustrative anecdote with no ground truth and no accuracy number.
+    </div>
+
+    <p class="small dim">Practical read: in 2026, directionality comes from release-date metadata joined against a curated relationship graph. The ML pipeline's job is <strong>candidate generation and localization</strong>, not adjudication. Design for that and the architecture gets much simpler.</p>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">03</span>
+      <h2>The generalization wall &mdash; read these numbers before you scope</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">Every system in this space reports two numbers: one on its own synthetic data, one on real material. The spread is the whole story.</p>
+  </div>
+
+  <div class="grid3" style="margin-bottom:26px">
+    <div class="card"><div class="metric"><span class="v good tnum">0.98</span><span class="k">MelodySim song-level weighted F1 on its own synthetic test split</span></div></div>
+    <div class="card"><div class="metric"><span class="v bad tnum">0.73</span><span class="k">MelodySim F1 on MCIC &mdash; 116 real court cases</span></div></div>
+    <div class="card"><div class="metric"><span class="v mid tnum">0.72</span><span class="k">Plain DTW-CQT on the same real cases &mdash; and it <em>wins</em> on accuracy, 0.71 vs 0.67</span></div></div>
+  </div>
+
+  <div class="tw" style="margin-bottom:22px">
+    <table>
+      <thead><tr><th>System / condition</th><th>Metric</th><th>In-domain</th><th>Real or transformed</th></tr></thead>
+      <tbody>
+        <tr><td>MelodySim (audio, MERT + triplet)</td><td>weighted F1</td><td class="n">0.98 &nbsp;<span class="dim">(song-level)</span></td><td class="n">0.73 &nbsp;<span class="dim">(prec 0.62)</span></td></tr>
+        <tr><td>DTW-CQT baseline</td><td>F1 / accuracy</td><td class="n">0.79</td><td class="n">0.72 / 0.71</td></tr>
+        <tr><td>BMM-Det &mdash; transposition</td><td>top-1 acc</td><td class="n">1.00</td><td class="n">&mdash;</td></tr>
+        <tr><td>BMM-Det &mdash; pitch shift / duration</td><td>top-1 acc</td><td class="n">0.98&ndash;1.00</td><td class="n">&mdash;</td></tr>
+        <tr class="hi"><td>BMM-Det &mdash; melody rewritten by VAE</td><td>top-1 acc</td><td class="n">&mdash;</td><td class="n">0.33 &nbsp;<span class="dim">(rank 6.89)</span></td></tr>
+        <tr><td>Query-by-humming, ~2k-song benchmark</td><td>top-10</td><td class="n">0.883&ndash;0.921</td><td class="n">&mdash;</td></tr>
+        <tr class="hi"><td>Query-by-humming, 90k-song catalog</td><td>top-10</td><td class="n">&mdash;</td><td class="n">0.707</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stack g20 col" style="max-width:74ch">
+    <p>Three things this table says. First, <strong>synthetic augmentation does not transfer.</strong> MelodySim's augmentations deliberately <em>preserve</em> melody, which is an easier regime than real borrowing; on real cases it produced 61 false positives against 15 false negatives, and a learned model losing to plain DTW is a strong signal that the training distribution is wrong, not that the architecture is.</p>
+    <p>Second, <strong>the transformations that matter are the ones that break it.</strong> Transposition is trivial for every method. Genuine melodic rewriting &mdash; which is exactly what an interpolation across genres looks like &mdash; drops BMM-Det to 0.33. The authors concede part of this may be irreducible: a rewritten melody "may exhibit significant differences" even though it is genuinely derived.</p>
+    <p>Third, <strong>scale hurts.</strong> Query-by-humming falls from ~0.9 top-10 on toy benchmarks to 0.707 on 90k songs. Your target catalog is three orders of magnitude larger than that.</p>
+
+    <div class="note warn">
+      <span class="h">The binding constraint</span>
+      Real ground-truth plagiarism data has barely grown in five years. BMM-Det's real-world set is <strong>29 song pairs</strong> (2021). Its 2025 successor, the SMP dataset, offers roughly <strong>70</strong>, and self-describes as "currently a sample-scale dataset designed to demonstrate our approach." MCIC's 116 cases are all labelled positive regardless of outcome &mdash; 66 of them were actually <em>denied</em> in court. Any precision estimate on real material in this field rests on about a hundred examples total.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">04</span>
+      <h2>The product that is actually missing</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">This is the strategic finding, and it came from the legal literature rather than the MIR literature.</p>
+  </div>
+
+  <div class="stack g24 col" style="max-width:74ch">
+    <p>Alfred Yen's <em>The Evidentiary Use and Misuse of Forensic Musicology in Copyright Litigation</em> (58 U.C. Davis L. Rev. 553, 2024) argues that courts systematically misuse expert musicological testimony. His line is sharp and it maps directly onto what software can and cannot legitimately do:</p>
+
+    <blockquote>"[I]t is proper for musicologists to identify formal musical similarities and offer information about the musical significance and rarity of those similarities. Courts should not, however, allow experts to offer opinions about the degree of similarity shared by two works (particularly opinions about 'substantial similarity') or conclusions about the existence of copying."</blockquote>
+
+    <p>Note what falls on each side. <strong>Rarity is admissible. Verdicts are not.</strong> An automated system that outputs "these two songs are 87% similar, therefore one copied the other" is producing precisely the testimony Yen argues should be excluded. A system that outputs "this eight-note descending figure appears in 1,412 other recordings, 340 of them predating the plaintiff's work" is producing the evidence courts actually credit.</p>
+
+    <p>And they do credit it. In <em>Structured Asset Sales v. Sheeran</em> (S.D.N.Y. 2023, affirmed 2d Cir. November 2024), the court found the chord progression "was used at least twenty-nine times before appearing in 'Let's Get It On' and was in another twenty-three songs before 'Thinking Out Loud' was released," with the harmonic rhythm in "at least eight other songs" before the first and "another fifteen" before the second. That enumeration carried the holding at summary judgment, and the Second Circuit used the term <em>prior art</em> directly. <em>Swirsky v. Carey</em> cuts the same way from the other side &mdash; "a measure is not commonplace just because it appears in a few songs." Courts want counts, not anecdotes.</p>
+
+    <p>Two things temper that. The <em>Sheeran</em> figures came from a single expert's hand-compiled list with no disclosed search method &mdash; precisely the base-rate problem Buccafusco and Tushnet identify, where a count means little without a denominator. And <strong>no court has yet engaged a computational or database-driven prior-art analysis.</strong> That evidentiary form is untested: the opportunity and the risk in one sentence.</p>
+
+    <p>And they demonstrably cannot get it. Yen quotes an expert who testified to keeping "large files of prior art" and calls the foundation "clearly inadequate" &mdash; a court "should not permit the expert to testify until the expert describes the content of the files and satisfies the court that the files offer an accurate picture of whatever 'prior art' matters to the case." In <em>Johannsongs-Publishing v. Lovland</em>, an expert report was <strong>excluded under Rule 702</strong> for exactly this: opining that certain musical features were "highly doubtful" to occur in other works without having analyzed prior art.</p>
+
+    <div class="note acc">
+      <span class="h">The reframe</span>
+      A corpus-scale prior-art index is a smaller technical problem than an ancestry oracle, it uses the same Layer A + Layer B machinery, it is <strong>symmetric</strong> so it never has to solve the direction problem, and it has a buyer &mdash; forensic musicologists, rights-clearance teams, and litigators who are currently losing motions for lack of it. The ancestry chains you actually want fall out later, once the index is joined against release dates.
+    </div>
+
+    <p class="small dim">The same literature is a warning about false positives. In <em>Skidmore v. Led Zeppelin</em> the defense expert characterized the disputed descending chord progression as "commonplace" and "a musical building block," and the Ninth Circuit sitting en banc affirmed for Led Zeppelin. In <em>Gray v. Hudson</em> ("Dark Horse"), the district court vacated a jury award and granted judgment as a matter of law for the defendants; the Ninth Circuit affirmed. Both turned on the archetype problem &mdash; the thing your system will generate the most of.</p>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">05</span>
+      <h2>What you can actually pick up and use</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">Everything below was verified to exist, resolve, and carry the licence stated.</p>
+  </div>
+
+  <div class="stack g32">
+
+    <div>
+      <h3 style="margin-bottom:14px">Models &amp; code</h3>
+      <div class="grid2">
+        <div class="card">
+          <h4>MelodySim</h4>
+          <p class="small">Frozen MERT-v1-95M + 1D conv ResNet + triplet head, on 10-second segments. Piece-level decision thresholds a segment-by-segment similarity matrix, requiring matches in both directions.</p>
+          <p class="small mono dim">github.com/AMAAI-Lab/MelodySim &middot; weights + 296 GB dataset on HF, CC-BY-3.0</p>
+        </div>
+        <div class="card">
+          <h4>BMM-Det</h4>
+          <p class="small">Bipartite max-matching over MIDI segments using relative pitch, relative duration and a downbeat indicator, edges weighted by edit distance. Returns colour-coded matched <em>fragments</em>, not one global score &mdash; the localization you need for a hook.</p>
+          <p class="small mono dim">github.com/xuan301/BMMDet_MPDSet &middot; MIT</p>
+        </div>
+        <div class="card">
+          <h4>CHAD (query-by-humming)</h4>
+          <p class="small">Treats humming retrieval as a special case of cover-song ID. 308+ hours of time-aligned cover fragments via a semi-supervised retraining loop. Authors conclude real humming data is still required for acceptable performance &mdash; covers alone lift top-10 only 0.621&rarr;0.707.</p>
+          <p class="small mono dim">github.com/amanteur/CHAD &middot; humming subset on HF</p>
+        </div>
+        <div class="card">
+          <h4>Genome of Melody toolchain</h4>
+          <p class="small">MAFFT v7.505 &rarr; <code>mrbayes volpiano</code> (a chant-specific fork of MrBayes 3.2.7a) &rarr; treeannotator &rarr; phyx. Fully released. The <em>tooling</em> is reusable; the input representation is monophonic, rhythm-free volpiano, so you need a transcription and re-encoding layer first.</p>
+          <p class="small mono dim">github.com/Genome-of-Melody &middot; github.com/gaballench/mrbayes_volpiano</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px">Front-end: audio &rarr; symbolic</h3>
+      <div class="grid3">
+        <div class="card flat" style="border-style:dashed">
+          <h4>Basic Pitch</h4>
+          <p class="small">Spotify, open source, instrument-agnostic polyphonic with pitch-bend detection. Best used one instrument at a time.</p>
+          <p class="small dim">Its README claims accuracy that "competes with much larger and more resource-hungry AMT systems"; the peer-reviewed ICASSP 2022 paper says only "marginally below" specialized SOTA. Read the README line as marketing.</p>
+        </div>
+        <div class="card flat" style="border-style:dashed">
+          <h4>YourMT3+</h4>
+          <p class="small">MLSP 2024, arXiv 2407.04822. Extends Google's MT3 to multi-task, multi-instrument transcription.</p>
+          <p class="small dim">A claim that it holds SOTA on Slakh2100 and ENST-Drums was <strong>refuted 0&ndash;3</strong> in verification. Benchmark it yourself.</p>
+        </div>
+        <div class="card flat" style="border-style:dashed">
+          <h4>Omnizart</h4>
+          <p class="small">Peer-reviewed toolkit (JOSS, <span class="mono">10.21105/joss.03391</span>) covering pitched instruments, vocal melody, chord, drum and beat transcription.</p>
+          <p class="small dim">Broadest coverage of the three; oldest.</p>
+        </div>
+      </div>
+      <p class="small dim" style="margin-top:12px;max-width:72ch">No verified source measures how transcription error compounds into downstream symbolic matching accuracy on commercial pop. That is an unmeasured risk sitting at the front of any audio-first pipeline, and it is worth an early spike.</p>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px">Corpora &amp; the graph layer</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Resource</th><th>What it gives you</th><th>Scale / terms</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Meertens Tune Collections</strong></td><td>Dutch folk melodies with tune-family annotations &mdash; the closest thing to labelled melodic-variant ground truth</td><td>MTC-ANN-2.0.1: 360 annotated &middot; MTC-FS-INST-2.0: ~18,000</td></tr>
+            <tr><td><strong>Themefinder</strong></td><td>Five melodic query encodings: absolute pitch, interval, scale degree, gross contour, refined contour</td><td>Classical / folk / Renaissance, CCARH-sponsored</td></tr>
+            <tr><td><strong>MusicBrainz</strong></td><td>Work-to-work relationship types including <em>Based on</em> and <em>Medley</em>, via <code>work-rels</code> / <code>work-level-rels</code></td><td>Hard <strong>1 request/second</strong> API limit &mdash; plan on bulk dumps, not crawling</td></tr>
+            <tr><td><strong>Wikidata</strong></td><td>P144 <em>based on</em> / P4969 <em>derivative work</em> inverse pair</td><td>Constraints explicitly discourage P144 for audio tracks; prefer P2550, P9810</td></tr>
+            <tr><td><strong>SecondHandSongs</strong></td><td>Documented API surface is <em>search and object retrieval only</em>; no derivation-traversal endpoint could be confirmed</td><td>Claims about <code>basedOn</code>/<code>derivedWorks</code> fields were refuted &mdash; but the schema page was unreachable, so verify directly</td></tr>
+            <tr><td><strong>MCIR</strong> (GWU + Columbia Law)</td><td>Music copyright infringement cases, mid-19th century forward, US and increasingly foreign</td><td>Browsable only &mdash; <strong>no bulk download</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px">Commercial: less than the marketing suggests</h3>
+      <div class="stack g12 col" style="max-width:74ch">
+        <p class="small"><strong>ACRCloud</strong> sells "Humming Recognition" (~1M songs, no published accuracy) and "Cover Song Identification" as products separate from its exact-fingerprint API. On the MIREX query-by-humming leaderboards its proprietary system beat the best academic model 0.990 vs 0.921 &mdash; but it published no numbers on the two <em>real-audio</em> sets, so the commercial-vs-academic gap is unmeasured precisely where provenance work lives.</p>
+        <p class="small"><strong>Google Hum to Search</strong> converts hummed audio to a timbre-stripped numerical melody sequence, but matches against only "thousands" of songs by Google's own description &mdash; explicitly not a full commercial catalog.</p>
+        <p class="small"><strong>Audible Magic</strong> is exact-recording fingerprinting. Its public technology page makes no claim of melody-level, composition-level, or interpolation matching, and none of derivation-chain output.</p>
+        <p class="small"><strong>Nobody publishes a derivation chain.</strong> No verified evidence surfaced of any commercial system that chains pairwise matches into multi-hop ancestry.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">06</span>
+      <h2>How I'd build it</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">Staged so each phase produces something usable on its own, and so the riskiest unknowns get tested first rather than last.</p>
+  </div>
+
+  <ol class="steps col" style="max-width:74ch">
+    <li><strong>Seed the graph before touching audio.</strong> Pull MusicBrainz work relationships and Wikidata P144/P4969, join on release dates, and you have a directed derivation graph on day one. Run Katz centrality over it. This alone reproduces the only working ancestry result in the literature, and it tells you how sparse the curated layer really is &mdash; which is the number that decides whether the whole product is viable.</li>
+    <li><strong>Spike the transcription front-end early.</strong> Take 50 known interpolation pairs, run Basic Pitch and Omnizart over both sides, and measure how much of the melodic relationship survives. Nobody has published this. If it doesn't survive, the audio-first architecture is dead and you go embedding-only &mdash; better to learn that in week two.</li>
+    <li><strong>Build retrieval on Layer A, not from scratch.</strong> ByteCover-style embeddings compressed to 128&ndash;256d into FAISS or pgvector. Treat ByteCover's published numbers as a 2021 floor; CoverHunter and the ByteCover2/3 line are ahead of it. This gives you candidate generation at catalog scale.</li>
+    <li><strong>Localize with symbolic alignment, and weight the scoring.</strong> BMM-Det for fragment-level matching. Don't use flat edit distance: notes with stronger rhythmic function are measurably more conserved (final &gt; stressed &gt; unstressed &gt; ornamental), and substitutions concentrate between neighbouring scale degrees. Van Kranenburg's metrical-accent weighting already does this for variant retrieval.</li>
+    <li><strong>Ship the prior-art index first.</strong> Invert the pipeline: for any n-gram, how many recordings contain it and what are their dates? Symmetric, defensible, sellable, and it is the denominator every downstream ancestry claim needs anyway.</li>
+    <li><strong>Only then infer chains &mdash; and abstain loudly.</strong> Direction from dates plus curated edges. Where the melodic figure is common in the prior-art index, or where the earliest instance is a folk or public-domain source, return "no single originator" rather than a name. Savage et al. found <em>zero</em> highly-related pairs across traditions, and the phylogenetics rooting failed outright: for the material where hooks most often come from, "find the original" may simply be ill-posed.</li>
+  </ol>
+
+  <div class="note" style="margin-top:26px;max-width:74ch">
+    <span class="h">On your Kjarkas example</span>
+    The chain you described &mdash; Los Kjarkas &rarr; Kaoma's "Lambada" &rarr; "On the Floor" &mdash; is a documented <em>rights and litigation</em> chain, already indexed by curated databases. Neither research pass independently verified it, so treat the specifics as widely reported rather than confirmed here. The important point stands regardless: that chain is in the graph because humans put it there. Your product's real value is in the undocumented tail, and the honest way to reach the tail is to make similarity searchable and let chronology plus curation do the arrows.
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">07</span>
+      <h2>What this survey could not establish</h2>
+    </div>
+    <p class="small dim col" style="max-width:72ch">Stated plainly, because silence here means "not verified", not "does not exist".</p>
+  </div>
+
+  <div class="stack g12 col" style="max-width:74ch">
+    <details>
+      <summary>Vendors that produced no verified claims</summary>
+      <div class="body">Pex, Sureel, Musical AI, BMAT, Matchtune, Rightsify / Sound Sample Detection, Believe and TuneCore's screening, and any platform-internal work at Spotify or Deezer. Also unverified: the melody-matching limits of Shazam, SoundHound and Aha Music, and whether WhoSampled offers any API, licensed feed, or bulk-access programme at all. If a licensed WhoSampled feed exists, it is probably the single highest-leverage thing you could acquire &mdash; it is the exact asset the only working ancestry paper ran on.</div>
+    </details>
+    <details>
+      <summary>Infrastructure and embeddings not reached</summary>
+      <div class="body">Peachnote, Musipedia, SIMSSA / CANTUS / DIAMM, RISM incipit search, Barlow &amp; Morgenstern, the Essen Folksong Collection. On the model side: MERT and MULE as standalone embeddings, CLAP, DiscogsEffnet / Essentia, and vector-search practicalities at 100M-track scale. CREPE, pYIN, melodia, Deep Salience and hFT-Transformer were not evaluated.</div>
+    </details>
+    <details>
+      <summary>Claims that were actively refuted</summary>
+      <div class="body">SecondHandSongs' <code>basedOn</code>/<code>derivedWorks</code> fields (0&ndash;3), its canonical "original performance" designation (1&ndash;2), its licensing terms and rate limits (1&ndash;2); Audible Magic's specific manipulation-robustness and 99.99% identification marketing claims (0&ndash;3); YourMT3's Slakh2100 / ENST-Drums SOTA results (0&ndash;3). A refuted claim means verification could not confirm it from the cited source &mdash; not that the opposite is true.</div>
+    </details>
+    <details>
+      <summary>Domain-transfer caveat worth taking seriously</summary>
+      <div class="body">The strongest evolutionary and alignment evidence &mdash; substitution matrices, indel rates, tree models &mdash; comes from oral-transmission folk and chant repertoires, where variation is mediated by human memory. Extending it to recording-mediated commercial pop borrowing is an untested extrapolation. Savage et al.'s automated alignments were also of "poor quality" and needed manual correction against original notation, so pair <em>detection</em> was automated corpus-wide but <em>alignment</em> was not hands-off.</div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ sources ============ -->
+<section>
+  <div class="sec-head">
+    <div class="row">
+      <span class="sec-num">&mdash;</span>
+      <h2>Sources</h2>
+    </div>
+    <p class="small dim">Primary sources behind the verified claims above. Two passes, 207 agents, 42 sources fetched, 25 claims adversarially verified, 8 killed.</p>
+  </div>
+
+  <div class="srcs">
+    <div class="s"><a href="https://arxiv.org/pdf/2010.14022">ByteCover: Cover Song Identification via Multi-Loss Training</a><span class="t">ICASSP 2021 &middot; arXiv 2010.14022</span></div>
+    <div class="s"><a href="https://arxiv.org/pdf/2505.20979">MelodySim: Measuring Melody-aware Music Similarity</a><span class="t">SUTD AMAAI Lab &middot; arXiv 2505.20979 (v2, Nov 2025)</span></div>
+    <div class="s"><a href="https://arxiv.org/pdf/2107.09889">Revealing Plagiarists: BMM-Det</a><span class="t">ACM Multimedia 2023 &middot; arXiv 2107.09889</span></div>
+    <div class="s"><a href="https://archives.ismir.net/ismir2011/paper/000017.pdf">Musical Influence Network Analysis and Rank of Sampled-Based Music</a><span class="t">Bryan &amp; Wang, ISMIR 2011 &middot; the CCRMA URL now 404s</span></div>
+    <div class="s"><a href="https://archives.ismir.net/ismir2023/paper/000077.pdf">Semi-supervised Query-by-Humming at Scale</a><span class="t">Amatov et al., ISMIR 2023</span></div>
+    <div class="s"><a href="https://pubmed.ncbi.nlm.nih.gov/35120658/">Sequence alignment of folk song melodies reveals cross-cultural regularities</a><span class="t">Savage et al., Current Biology 2022 &middot; 10,062 melodies</span></div>
+    <div class="s"><a href="https://doi.org/10.32942/x2g635">Genome of Melody: applying bioinformatics to chant transmission</a><span class="t">Phil. Trans. R. Soc. B 380:20240274 (2025) &middot; open preprint</span></div>
+    <div class="s"><a href="https://lawreview.law.ucdavis.edu/sites/g/files/dgvnsk15026/files/2024-11/58-1_Yen.pdf">The Evidentiary Use and Misuse of Forensic Musicology in Copyright Litigation</a><span class="t">Alfred C. Yen, 58 U.C. Davis L. Rev. 553 (2024)</span></div>
+    <div class="s"><a href="https://blogs.law.gwu.edu/mcir/">Music Copyright Infringement Resource</a><span class="t">GWU Law + Columbia Law &middot; Charles Cronin</span></div>
+    <div class="s"><a href="https://arxiv.org/abs/2509.08282">SMP: a sample-scale music plagiarism dataset</a><span class="t">Mippia, 2025 &middot; ~70 real pairs</span></div>
+    <div class="s"><a href="https://github.com/pvankranenburg/MTCFeatures">Meertens Tune Collections &mdash; MTCFeatures</a><span class="t">MTC-ANN-2.0.1 (360) &middot; MTC-FS-INST-2.0 (~18,000)</span></div>
+    <div class="s"><a href="https://musicbrainz.org/relationships/work-work">MusicBrainz work&ndash;work relationship types</a><span class="t">"Based on", "Medley" &middot; 1 req/sec API limit</span></div>
+    <div class="s"><a href="https://www.wikidata.org/wiki/Property:P144">Wikidata P144 &mdash; based on</a><span class="t">Inverse of P4969 &middot; constraints discourage audio-track use</span></div>
+    <div class="s"><a href="https://blog.google/products/search/hum-to-search/">Google &mdash; Hum to Search</a><span class="t">Melody-sequence matching over "thousands" of songs</span></div>
+    <div class="s"><a href="https://www.acrcloud.com/humming-recognition/">ACRCloud Humming Recognition</a><span class="t">~1M songs &middot; no published accuracy</span></div>
+    <div class="s"><a href="https://github.com/spotify/basic-pitch">Spotify Basic Pitch</a><span class="t">Bittner et al., ICASSP 2022</span></div>
+    <div class="s"><a href="https://arxiv.org/abs/2407.04822">YourMT3+</a><span class="t">MLSP 2024 &middot; SOTA claim unverified</span></div>
+    <div class="s"><a href="https://www.themefinder.org/">Themefinder</a><span class="t">Five melodic query encodings &middot; CCARH</span></div>
+  </div>
+</section>
+
+</div>

@@ -1,0 +1,42 @@
+{
+  "essen": {
+    "works": 8460,
+    "median_pitch": 69.0,
+    "in_melodic_band": 1.0,
+    "below_band_likely_bass": 0.0,
+    "median_range_semitones": 13.0,
+    "near_flat_lines": 31
+  },
+  "lakh-clean": {
+    "works": 10011,
+    "median_pitch": 69.0,
+    "in_melodic_band": 0.968,
+    "below_band_likely_bass": 0.025,
+    "median_range_semitones": 19,
+    "near_flat_lines": 245
+  },
+  "mtc-fs-inst": {
+    "works": 8986,
+    "median_pitch": 72.0,
+    "in_melodic_band": 1.0,
+    "below_band_likely_bass": 0.0,
+    "median_range_semitones": 14.0,
+    "near_flat_lines": 26
+  },
+  "nottingham": {
+    "works": 2068,
+    "median_pitch": 72.0,
+    "in_melodic_band": 1.0,
+    "below_band_likely_bass": 0.0,
+    "median_range_semitones": 17.0,
+    "near_flat_lines": 0
+  },
+  "pop909": {
+    "works": 909,
+    "median_pitch": 72.0,
+    "in_melodic_band": 0.996,
+    "below_band_likely_bass": 0.0,
+    "median_range_semitones": 18,
+    "near_flat_lines": 0
+  }
+}

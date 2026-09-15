@@ -1,0 +1,11 @@
+{
+  "n": 200,
+  "counts": {
+    "sym_self": 200,
+    "sym_fam": 138,
+    "a1_self": 200,
+    "a1_fam": 132,
+    "al_self": 200,
+    "al_fam": 132
+  }
+}
